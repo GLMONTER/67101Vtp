@@ -101,7 +101,7 @@ void trackPosition()
 
 	position.a += a;
   
-    pros::lcd::print(0, "x :  %f\n", position.x);
+    //pros::lcd::print(0, "x :  %f\n", position.x);
     pros::lcd::print(1, "y :  %f\n", position.y);
 
     pros::lcd::print(2, "left :  %d\n", leftEncoder.get_value());
