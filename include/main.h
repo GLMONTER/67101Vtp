@@ -40,7 +40,7 @@
 /**
  * You should add more #includes here
  */
-//#include "okapi/api.hpp"
+#include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
 
 /**
@@ -53,7 +53,7 @@
  */
 // using namespace pros;
 // using namespace pros::literals;
-// using namespace okapi;
+using namespace okapi;
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

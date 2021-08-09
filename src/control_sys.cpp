@@ -10,6 +10,22 @@ pros::Motor leftBack(10, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor fourBar(11, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, false);
 
+//both pneumatics
+pros::ADIDigitalOut pneumaticPrimary('A', LOW);
+pros::ADIDigitalOut pneumaticSecondary('B', LOW);
+
+void extendPneumatics()
+{
+    pneumaticPrimary.set_value(HIGH);
+    pneumaticSecondary.set_value(HIGH);
+}
+
+void retractPneumatics()
+{
+    pneumaticPrimary.set_value(LOW);
+    pneumaticSecondary.set_value(LOW);
+}
+
 void setDrive(const int32_t leftPower, const int32_t rightPower)
 {
     rightFront.move(rightPower);
@@ -68,7 +84,7 @@ float getNewPIDCONTROL(const float error)
     
     return (integral*Ki) + (derivative*Kd) + (error*Kp);
 }
-void moveFourBar()
+void moveCascade()
 {
     pros::lcd::print(0, "%f" ,fourBar.get_position());
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))

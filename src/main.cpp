@@ -17,12 +17,12 @@ void autonomous() {}
 
 
 extern bool runningAuton;
-extern void moveToPoint(const float x, const float y, const float angle);
+
 void opcontrol() 
 {
 	fourBar.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	runningAuton = false;
-	controlLoader();
+	
 	while(true)
 	{
 		int32_t ch1 = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -34,7 +34,10 @@ void opcontrol()
 		rightFront.move(ch3 - ch1 - ch4);
 		leftBack.move(ch3 + ch1 - ch4);
 		rightBack.move(ch3 - ch1 + ch4);
+
 		moveFourBar();
+		controlLoader();
+
 		pros::delay(5);
 	}
 }
