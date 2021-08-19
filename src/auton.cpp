@@ -1,5 +1,5 @@
 #include"main.h"
-
+/*
 auto chassis = ChassisControllerBuilder()
     .withMotors(1, -2) // left motor is 1, right motor is 2 (reversed)
     .withGains(
@@ -17,7 +17,7 @@ auto chassis = ChassisControllerBuilder()
     .withDimensions(AbstractMotor::gearset::green, {{2.75_in, 7_in, 1_in, 2.75_in}, quadEncoderTPR})
     .withOdometry() // use the same scales as the chassis (above)
     .buildOdometry(); // build an odometry chassis
-
+*/
 void init()
 {
     

@@ -10,7 +10,7 @@ enum loaderSetting
 };
 void setLoader(loaderSetting setting);
 void controlLoader();
-void moveCasade();
+void moveCascade();
 
 
 extern pros::Controller controller;

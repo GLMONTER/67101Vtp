@@ -1,10 +1,8 @@
 #include "main.h"
-extern void trackPosition();
 
 void initialize() 
 {
 	pros::lcd::initialize();
-	pros::Task TRACKPOS(trackPosition);
 }
 
 
@@ -25,17 +23,13 @@ void opcontrol()
 	
 	while(true)
 	{
-		int32_t ch1 = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-		int32_t ch2 = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
-		int32_t ch3 = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-		int32_t ch4 = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
+		leftFront.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		leftBack.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
+		rightFront.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+		rightBack.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
-		leftFront.move(ch3 + ch1 + ch4);
-		rightFront.move(ch3 - ch1 - ch4);
-		leftBack.move(ch3 + ch1 - ch4);
-		rightBack.move(ch3 - ch1 + ch4);
 
-		moveFourBar();
+		moveCascade();
 		controlLoader();
 
 		pros::delay(5);

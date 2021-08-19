@@ -2,10 +2,10 @@
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::Motor rightFront(6, pros::E_MOTOR_GEARSET_18, true);
-pros::Motor leftFront(20, pros::E_MOTOR_GEARSET_18, false);
-pros::Motor rightBack(18, pros::E_MOTOR_GEARSET_18, true);
-pros::Motor leftBack(10, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor rightFront(9, pros::E_MOTOR_GEARSET_18, true);
+pros::Motor leftFront(10, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor rightBack(1, pros::E_MOTOR_GEARSET_18, true);
+pros::Motor leftBack(2, pros::E_MOTOR_GEARSET_18, false);
 
 pros::Motor fourBar(11, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, false);
