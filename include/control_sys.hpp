@@ -11,7 +11,7 @@ enum loaderSetting
 void setLoader(loaderSetting setting);
 void controlLoader();
 void moveCascade();
-
+void moveGoalLift();
 
 extern pros::Controller controller;
 
@@ -22,4 +22,5 @@ extern pros::Motor leftBack;
 
 extern pros::Motor fourBar;
 extern pros::Motor intake;
+extern pros::Motor goalLift;
 

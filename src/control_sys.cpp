@@ -2,17 +2,25 @@
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::Motor rightFront(9, pros::E_MOTOR_GEARSET_18, true);
-pros::Motor leftFront(10, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor rightFront(10, pros::E_MOTOR_GEARSET_18, true);
+pros::Motor leftFront(3, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor rightBack(1, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor leftBack(2, pros::E_MOTOR_GEARSET_18, false);
 
 pros::Motor fourBar(11, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor goalLift(15, pros::E_MOTOR_GEARSET_36, false);
 
 //both pneumatics
 pros::ADIDigitalOut pneumaticPrimary('A', LOW);
 pros::ADIDigitalOut pneumaticSecondary('B', LOW);
+
+enum checkStates 
+{
+    larger = 0,
+    smaller = 1,
+    correct = 2
+};
 
 void extendPneumatics()
 {
@@ -32,6 +40,41 @@ void setDrive(const int32_t leftPower, const int32_t rightPower)
     rightBack.move(rightPower);
     leftFront.move(leftPower);
     leftBack.move(leftPower);
+}
+int checkPosition(int32_t topValue, int32_t botValue, int32_t currentValue)
+{
+    if(currentValue > topValue)
+        return checkStates::larger;
+    if(currentValue < botValue)
+        return checkStates::smaller;
+    else
+        return checkStates::correct;
+
+}
+void moveGoalLift()
+{
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+    {
+        //multiply by negative 1 to get correct top and bottom value.
+        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::correct || 
+        checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::smaller)
+        {
+            goalLift.move(127);
+        }
+    }
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+    {
+        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::correct || 
+        checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::larger)
+        {
+            goalLift.move(-127);
+        }
+    }
+    else
+    {
+        goalLift.move_velocity(0);
+    }
+    std::cout<<goalLift.get_position()<<std::endl;
 }
 void setLoader(loaderSetting setting)
 {
@@ -101,14 +144,14 @@ void moveCascade()
         }
         
     }
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
-    {
-        fourBar.move(127);
-    }
-    else
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
     {
         fourBar.move(-127);
+    }
+    else
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
+    {
+        fourBar.move(127);
     }
     else
     {
