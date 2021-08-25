@@ -18,7 +18,7 @@ extern bool runningAuton;
 
 void opcontrol() 
 {
-	fourBar.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	cascade.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	goalLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	runningAuton = false;

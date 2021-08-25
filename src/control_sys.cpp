@@ -7,7 +7,7 @@ pros::Motor leftFront(3, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor rightBack(1, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor leftBack(2, pros::E_MOTOR_GEARSET_18, false);
 
-pros::Motor fourBar(11, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor cascade(11, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor goalLift(15, pros::E_MOTOR_GEARSET_36, false);
 
@@ -15,7 +15,11 @@ pros::Motor goalLift(15, pros::E_MOTOR_GEARSET_36, false);
 pros::ADIDigitalOut pneumaticPrimary('A', LOW);
 pros::ADIDigitalOut pneumaticSecondary('B', LOW);
 
-enum checkStates 
+//when enabled, systems like the goal lifts will check internal encoder position to make sure there is no 
+//mechanical damage from rotating the mechanism too far
+#define ENABLE_CHECKS false
+
+enum CheckStates 
 {
     larger = 0,
     smaller = 1,
@@ -41,31 +45,41 @@ void setDrive(const int32_t leftPower, const int32_t rightPower)
     leftFront.move(leftPower);
     leftBack.move(leftPower);
 }
+//generic function to verify positions of mechanims that can break when over-rotated.
 int checkPosition(int32_t topValue, int32_t botValue, int32_t currentValue)
 {
     if(currentValue > topValue)
-        return checkStates::larger;
+        return CheckStates::larger;
     if(currentValue < botValue)
-        return checkStates::smaller;
+        return CheckStates::smaller;
     else
-        return checkStates::correct;
+        return CheckStates::correct;
 
 }
 void moveGoalLift()
 {
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
     {
+        if(!ENABLE_CHECKS)
+        {
+            goalLift.move(127);
+        }
+        else
         //multiply by negative 1 to get correct top and bottom value.
-        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::correct || 
-        checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::smaller)
+        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::correct || 
+        checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::smaller)
         {
             goalLift.move(127);
         }
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
-        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::correct || 
-        checkPosition(-1500, 0, goalLift.get_position() * -1) == checkStates::larger)
+        if(!ENABLE_CHECKS)
+        {
+            goalLift.move(-127);
+        }
+        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::correct || 
+        checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::larger)
         {
             goalLift.move(-127);
         }
@@ -101,6 +115,7 @@ void controlLoader()
         setLoader(loaderSetting::Disabled);
     }
 }
+//generic PID function
 float getNewPIDCONTROL(const float error)
 {
    // static float error;
@@ -129,15 +144,15 @@ float getNewPIDCONTROL(const float error)
 }
 void moveCascade()
 {
-    pros::lcd::print(0, "%f" ,fourBar.get_position());
+    pros::lcd::print(0, "%f" ,cascade.get_position());
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
     {
-        while(std::abs(fourBar.get_position() - 1300) > 50)
+        while(std::abs(cascade.get_position() - 1300) > 50)
         {
-            fourBar.move(-getNewPIDCONTROL(fourBar.get_position() - 1300));
+            cascade.move(-getNewPIDCONTROL(cascade.get_position() - 1300));
             pros::delay(5);
         }
-        fourBar.move_velocity(0);
+        cascade.move_velocity(0);
         while (true)
         {
             pros::delay(5);
@@ -146,15 +161,15 @@ void moveCascade()
     }
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
     {
-        fourBar.move(-127);
+        cascade.move(-127);
     }
     else
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
     {
-        fourBar.move(127);
+        cascade.move(127);
     }
     else
     {
-        fourBar.move_velocity(0);
+        cascade.move_velocity(0);
     }
 }

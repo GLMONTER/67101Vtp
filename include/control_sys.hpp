@@ -20,7 +20,7 @@ extern pros::Motor leftFront;
 extern pros::Motor rightBack;
 extern pros::Motor leftBack;
 
-extern pros::Motor fourBar;
+extern pros::Motor cascade;
 extern pros::Motor intake;
 extern pros::Motor goalLift;
 
