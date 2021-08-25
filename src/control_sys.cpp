@@ -7,7 +7,7 @@ pros::Motor leftFront(3, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor rightBack(1, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor leftBack(2, pros::E_MOTOR_GEARSET_18, false);
 
-pros::Motor cascade(11, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor cascadeLeft(11, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor goalLift(15, pros::E_MOTOR_GEARSET_36, false);
 
