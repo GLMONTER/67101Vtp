@@ -7,8 +7,8 @@ pros::Motor leftFront(3, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor rightBack(1, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor leftBack(2, pros::E_MOTOR_GEARSET_18, false);
 
-pros::Motor cascadeLeft(11, pros::E_MOTOR_GEARSET_18, false);
-pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor cascade(11, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor goalLift(15, pros::E_MOTOR_GEARSET_36, false);
 
 //both pneumatics
@@ -19,12 +19,27 @@ pros::ADIDigitalOut pneumaticSecondary('B', LOW);
 //mechanical damage from rotating the mechanism too far
 #define ENABLE_CHECKS false
 
+const float rightCascadeRatio = 30.0f/36.0f;
+
 enum CheckStates 
 {
     larger = 0,
     smaller = 1,
     correct = 2
 };
+
+enum cascadeStates
+{
+    bottom = 0,
+    middle = 1,
+    top = 2,
+
+
+    bottomPosition = 0,
+    middlePosition = 500,
+    topPosition = 1000
+};
+int cascadeCurrentState = cascadeStates::bottom;
 
 void extendPneumatics()
 {
@@ -144,32 +159,57 @@ float getNewPIDCONTROL(const float error)
 }
 void moveCascade()
 {
+    static int setPosition;
+    if(cascadeCurrentState == cascadeStates::bottom)
+        setPosition = cascadeStates::bottomPosition;
+    else if(cascadeCurrentState == cascadeStates::middle)
+        setPosition = cascadeStates::middlePosition;
+    else if(cascadeCurrentState == cascadeStates::top)
+        setPosition = cascadeStates::topPosition;
+    if(std::abs(cascade.get_position() - setPosition) > 50)
+    {
+         while(std::abs(cascade.get_position() - setPosition) > 50)
+        {
+            cascade.move(-getNewPIDCONTROL(cascade.get_position() - setPosition));
+            intake.move((-getNewPIDCONTROL(cascade.get_position() - setPosition)) * rightCascadeRatio);
+            pros::delay(5);
+        }
+        cascade.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+        cascade.move_velocity(0);
+    }
+    else
+    {
+        cascade.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+        cascade.move_velocity(0);
+    }
+}
+void setCascade()
+{
     pros::lcd::print(0, "%f" ,cascade.get_position());
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
     {
-        while(std::abs(cascade.get_position() - 1300) > 50)
-        {
-            cascade.move(-getNewPIDCONTROL(cascade.get_position() - 1300));
-            pros::delay(5);
-        }
-        cascade.move_velocity(0);
-        while (true)
-        {
-            pros::delay(5);
-        }
-        
+        if(cascadeCurrentState != cascadeStates::bottom)
+            cascadeCurrentState -= 1;
+    }
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
+    {
+        if(cascadeCurrentState != cascadeStates::top)
+            cascadeCurrentState += 1;
     }
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
     {
         cascade.move(-127);
+        intake.move((int)(-127.0f * rightCascadeRatio));
     }
     else
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
     {
         cascade.move(127);
+        intake.move((int)(127.0f * rightCascadeRatio));
     }
     else
     {
         cascade.move_velocity(0);
+        intake.move(0);
     }
 }

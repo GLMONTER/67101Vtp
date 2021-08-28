@@ -11,6 +11,7 @@ enum loaderSetting
 void setLoader(loaderSetting setting);
 void controlLoader();
 void moveCascade();
+void setCascade();
 void moveGoalLift();
 
 extern pros::Controller controller;

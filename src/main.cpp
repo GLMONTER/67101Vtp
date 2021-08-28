@@ -30,9 +30,9 @@ void opcontrol()
 		rightFront.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 		rightBack.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
-
-		moveCascade();
-		controlLoader();
+		setCascade();
+	//	moveCascade();
+		//controlLoader();
 		moveGoalLift();
 
 		pros::delay(5);
