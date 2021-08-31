@@ -13,7 +13,7 @@ void controlLoader();
 void moveCascade();
 void setCascade();
 void moveGoalLift();
-
+void actuatePneumatics();
 extern pros::Controller controller;
 
 extern pros::Motor rightFront;

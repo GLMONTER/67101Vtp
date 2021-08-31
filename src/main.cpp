@@ -34,6 +34,7 @@ void opcontrol()
 	//	moveCascade();
 		//controlLoader();
 		moveGoalLift();
+		actuatePneumatics();
 
 		pros::delay(5);
 	}

@@ -71,6 +71,17 @@ int checkPosition(int32_t topValue, int32_t botValue, int32_t currentValue)
         return CheckStates::correct;
 
 }
+void actuatePneumatics()
+{
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
+    {
+        extendPneumatics();
+    }
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+    {
+        retractPneumatics();
+    }
+}
 void moveGoalLift()
 {
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
@@ -80,11 +91,13 @@ void moveGoalLift()
             goalLift.move(127);
         }
         else
+        {
         //multiply by negative 1 to get correct top and bottom value.
         if(checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::correct || 
         checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::smaller)
         {
             goalLift.move(127);
+        }
         }
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
@@ -93,10 +106,13 @@ void moveGoalLift()
         {
             goalLift.move(-127);
         }
+        else
+        {
         if(checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::correct || 
         checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::larger)
         {
             goalLift.move(-127);
+        }
         }
     }
     else
