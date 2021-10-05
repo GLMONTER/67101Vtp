@@ -14,6 +14,7 @@ void moveCascade();
 void setCascade();
 void moveGoalLift();
 void actuatePneumatics();
+void actuateRingFlip();
 extern pros::Controller controller;
 
 extern pros::Motor rightFront;
@@ -22,6 +23,7 @@ extern pros::Motor rightBack;
 extern pros::Motor leftBack;
 
 extern pros::Motor cascade;
+extern pros::Motor ringFlip;
 extern pros::Motor intake;
 extern pros::Motor goalLift;
 

@@ -31,10 +31,11 @@ void opcontrol()
 		rightBack.move(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
 		setCascade();
-	//	moveCascade();
-		//controlLoader();
+		moveCascade();
+		controlLoader();
 		moveGoalLift();
-		actuatePneumatics();
+		actuateRingFlip();
+		//actuatePneumatics();
 
 		pros::delay(5);
 	}

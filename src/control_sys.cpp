@@ -8,6 +8,7 @@ pros::Motor rightBack(1, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor leftBack(2, pros::E_MOTOR_GEARSET_18, false);
 
 pros::Motor cascade(11, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor ringFlip(9, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor goalLift(15, pros::E_MOTOR_GEARSET_36, false);
 
@@ -71,6 +72,26 @@ int checkPosition(int32_t topValue, int32_t botValue, int32_t currentValue)
         return CheckStates::correct;
 
 }
+void actuateRingFlip()
+{
+    std::cout<<"test";
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
+    {
+        while(std::abs(ringFlip.get_position() - 0) > 5)
+            ringFlip.move_absolute(0, 50);
+    }
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
+    {
+        while(std::abs(ringFlip.get_position() - 100) > 5)
+            ringFlip.move_absolute(100, 50);
+    }
+    else
+    {
+        ringFlip.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        ringFlip.move_velocity(0);
+    }
+    
+}
 void actuatePneumatics()
 {
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
@@ -119,7 +140,7 @@ void moveGoalLift()
     {
         goalLift.move_velocity(0);
     }
-    std::cout<<goalLift.get_position()<<std::endl;
+    //std::cout<<goalLift.get_position()<<std::endl;
 }
 void setLoader(loaderSetting setting)
 {
@@ -146,23 +167,21 @@ void controlLoader()
         setLoader(loaderSetting::Disabled);
     }
 }
-//generic PID function
-float getNewPIDCONTROL(const float error)
-{
-   // static float error;
+// static float error;
     static float integral;
     static float derivative;
     static float previousError;
-    static float driveValue;
-
-    const float Ki = 0.005;
-    const float Kd = 0.01f;
-    const float Kp = 0.04f;
+//generic PID function
+float getNewPIDCONTROL(const float error)
+{
+    const float Ki = 0.001;
+    const float Kd = 0.005f;
+    const float Kp = 0.001f;
     //subject to change heading for yaw
     
     integral = integral + error;
     
-    if(abs(error) < 0.25f)
+    if(abs(error) < 5.0f)
     {
         integral = 0.0f;
     }
@@ -182,12 +201,14 @@ void moveCascade()
         setPosition = cascadeStates::middlePosition;
     else if(cascadeCurrentState == cascadeStates::top)
         setPosition = cascadeStates::topPosition;
-    if(std::abs(cascade.get_position() - setPosition) > 50)
+    if(std::abs(cascade.get_position() - setPosition) > 20)
     {
-         while(std::abs(cascade.get_position() - setPosition) > 50)
+        previousError = 0;
+        integral = 0;
+        derivative = 0;
+         while(std::abs(cascade.get_position() - setPosition) > 20)
         {
             cascade.move(-getNewPIDCONTROL(cascade.get_position() - setPosition));
-            intake.move((-getNewPIDCONTROL(cascade.get_position() - setPosition)) * rightCascadeRatio);
             pros::delay(5);
         }
         cascade.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -212,20 +233,19 @@ void setCascade()
         if(cascadeCurrentState != cascadeStates::top)
             cascadeCurrentState += 1;
     }
+    /*
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
     {
         cascade.move(-127);
-        intake.move((int)(-127.0f * rightCascadeRatio));
     }
     else
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
     {
         cascade.move(127);
-        intake.move((int)(127.0f * rightCascadeRatio));
     }
     else
     {
-        cascade.move_velocity(0);
-        intake.move(0);
+       // cascade.move_velocity(0);
     }
+    */
 }
