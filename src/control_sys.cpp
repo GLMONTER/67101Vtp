@@ -2,19 +2,20 @@
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::Motor rightFront(10, pros::E_MOTOR_GEARSET_18, true);
-pros::Motor leftFront(3, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor rightBack(1, pros::E_MOTOR_GEARSET_18, true);
-pros::Motor leftBack(2, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor leftBack(8, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor rightFront(11, pros::E_MOTOR_GEARSET_18, true);
+pros::Motor leftFront(20, pros::E_MOTOR_GEARSET_18, false);
 
-pros::Motor cascade(11, pros::E_MOTOR_GEARSET_18, false);
-pros::Motor ringFlip(9, pros::E_MOTOR_GEARSET_18, false);
-pros::Motor intake(12, pros::E_MOTOR_GEARSET_18, true);
-pros::Motor goalLift(15, pros::E_MOTOR_GEARSET_36, false);
+pros::Motor topTwist(2, pros::E_MOTOR_GEARSET_18, false);
 
-//both pneumatics
-pros::ADIDigitalOut pneumaticPrimary('A', LOW);
-pros::ADIDigitalOut pneumaticSecondary('B', LOW);
+
+pros::Motor cascade(5, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor ringFlip(4, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor intake(6, pros::E_MOTOR_GEARSET_18, false);
+
+pros::Motor frontGoalLift(10, pros::E_MOTOR_GEARSET_36, false);
+pros::Motor rearGoalLift(3, pros::E_MOTOR_GEARSET_36, false);
 
 //when enabled, systems like the goal lifts will check internal encoder position to make sure there is no 
 //mechanical damage from rotating the mechanism too far
@@ -35,30 +36,16 @@ enum cascadeStates
     middle = 1,
     top = 2,
 
-
     bottomPosition = 0,
     middlePosition = 500,
     topPosition = 1000
 };
+
 int cascadeCurrentState = cascadeStates::bottom;
-
-void extendPneumatics()
-{
-    pneumaticPrimary.set_value(HIGH);
-    pneumaticSecondary.set_value(HIGH);
-}
-
-void retractPneumatics()
-{
-    pneumaticPrimary.set_value(LOW);
-    pneumaticSecondary.set_value(LOW);
-}
 
 void setDrive(const int32_t leftPower, const int32_t rightPower)
 {
-    rightFront.move(rightPower);
     rightBack.move(rightPower);
-    leftFront.move(leftPower);
     leftBack.move(leftPower);
 }
 //generic function to verify positions of mechanims that can break when over-rotated.
@@ -70,75 +57,68 @@ int checkPosition(int32_t topValue, int32_t botValue, int32_t currentValue)
         return CheckStates::smaller;
     else
         return CheckStates::correct;
-
 }
 void actuateRingFlip()
 {
     std::cout<<"test";
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
     {
-        while(std::abs(ringFlip.get_position() - 0) > 5)
-            ringFlip.move_absolute(0, 50);
+        ringFlip.move(20);
     }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
     {
-        while(std::abs(ringFlip.get_position() - 100) > 5)
-            ringFlip.move_absolute(100, 50);
+        ringFlip.move(-20);
     }
     else
     {
-        ringFlip.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
         ringFlip.move_velocity(0);
     }
-    
+    //pros::delay(10);
 }
-void actuatePneumatics()
+void actuatetopTwist()
 {
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
+    std::cout<<"test";
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
     {
-        extendPneumatics();
+        topTwist.move(100);
     }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
     {
-        retractPneumatics();
+        topTwist.move(-100);
     }
+    else
+    {
+        topTwist.move_velocity(0);
+    }
+    //pros::delay(10);
 }
+
 void moveGoalLift()
 {
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
     {
-        if(!ENABLE_CHECKS)
-        {
-            goalLift.move(127);
-        }
-        else
-        {
-        //multiply by negative 1 to get correct top and bottom value.
-        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::correct || 
-        checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::smaller)
-        {
-            goalLift.move(127);
-        }
-        }
+        frontGoalLift.move_absolute(0, 200);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
-        if(!ENABLE_CHECKS)
-        {
-            goalLift.move(-127);
-        }
-        else
-        {
-        if(checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::correct || 
-        checkPosition(-1500, 0, goalLift.get_position() * -1) == CheckStates::larger)
-        {
-            goalLift.move(-127);
-        }
-        }
+        frontGoalLift.move_absolute(-3700, 200);
     }
     else
     {
-        goalLift.move_velocity(0);
+        frontGoalLift.move_velocity(0);
+    }
+    //rear goal lift
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+    {
+        rearGoalLift.move_absolute(0, 200);
+    }
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+    {
+        rearGoalLift.move_absolute(-2000, 200);
+    }
+    else
+    {
+        rearGoalLift.move_velocity(0);
     }
     //std::cout<<goalLift.get_position()<<std::endl;
 }
@@ -153,12 +133,12 @@ void setLoader(loaderSetting setting)
 }
 void controlLoader()
 {
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+    static int reverseFlag = 0;
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
     {
         setLoader(loaderSetting::Intake);
     }
-    else
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
     {
         setLoader(loaderSetting::Outake);
     }
@@ -166,11 +146,12 @@ void controlLoader()
     {
         setLoader(loaderSetting::Disabled);
     }
+    
 }
 // static float error;
-    static float integral;
-    static float derivative;
-    static float previousError;
+static float integral;
+static float derivative;
+static float previousError;
 //generic PID function
 float getNewPIDCONTROL(const float error)
 {
@@ -201,11 +182,13 @@ void moveCascade()
         setPosition = cascadeStates::middlePosition;
     else if(cascadeCurrentState == cascadeStates::top)
         setPosition = cascadeStates::topPosition;
+
     if(std::abs(cascade.get_position() - setPosition) > 20)
     {
         previousError = 0;
         integral = 0;
         derivative = 0;
+        
          while(std::abs(cascade.get_position() - setPosition) > 20)
         {
             cascade.move(-getNewPIDCONTROL(cascade.get_position() - setPosition));
@@ -219,33 +202,21 @@ void moveCascade()
         cascade.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
         cascade.move_velocity(0);
     }
+   // pros::delay(10);
 }
 void setCascade()
 {
     pros::lcd::print(0, "%f" ,cascade.get_position());
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
-    {
-        if(cascadeCurrentState != cascadeStates::bottom)
-            cascadeCurrentState -= 1;
-    }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
-    {
-        if(cascadeCurrentState != cascadeStates::top)
-            cascadeCurrentState += 1;
-    }
-    /*
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
     {
         cascade.move(-127);
     }
-    else
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
     {
         cascade.move(127);
     }
     else
     {
-       // cascade.move_velocity(0);
+        cascade.move_velocity(0);
     }
-    */
 }

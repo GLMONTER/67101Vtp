@@ -8,22 +8,29 @@ enum loaderSetting
     Intake = 1,
     Outake = 2
 };
+
 void setLoader(loaderSetting setting);
 void controlLoader();
 void moveCascade();
 void setCascade();
 void moveGoalLift();
-void actuatePneumatics();
+
 void actuateRingFlip();
+void actuatetopTwist();
+
 extern pros::Controller controller;
 
-extern pros::Motor rightFront;
-extern pros::Motor leftFront;
 extern pros::Motor rightBack;
 extern pros::Motor leftBack;
+extern pros::Motor rightFront;
+extern pros::Motor leftFront;
+
+extern pros::Motor topTwist;
+
 
 extern pros::Motor cascade;
 extern pros::Motor ringFlip;
 extern pros::Motor intake;
-extern pros::Motor goalLift;
+extern pros::Motor frontGoalLift;
+extern pros::Motor rearGoalLift;
 
