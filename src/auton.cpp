@@ -43,17 +43,17 @@ void skills()
 
 }
 
-pros::ADIEncoder leftEncoder(3, 4, false);
-pros::ADIEncoder rightEncoder(5, 6, false);
-pros::ADIEncoder middleEncoder(9, 9, false);
+pros::Rotation leftEncoder(1);
+pros::Rotation rightEncoder(2);
+pros::Rotation middleEncoder(3);
 
 void trackPosition()
 {    
     while(true)
     {
-    int32_t left = leftEncoder.get_value();
-    int32_t right = rightEncoder.get_value();
-    int32_t back = middleEncoder.get_value();
+    int32_t left = leftEncoder.get_position();
+    int32_t right = rightEncoder.get_position();
+    int32_t back = middleEncoder.get_position();
 
     float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
 	float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
@@ -101,9 +101,9 @@ void trackPosition()
     pros::lcd::print(0, "x :  %f\n", gPosition.x);
     pros::lcd::print(1, "y :  %f\n", gPosition.y);
 
-    pros::lcd::print(2, "left :  %d\n", leftEncoder.get_value());
-    pros::lcd::print(3, "right :  %d\n", rightEncoder.get_value());
-    pros::lcd::print(4, "middle :  %d\n", middleEncoder.get_value());
+    pros::lcd::print(2, "left :  %d\n", leftEncoder.get_position());
+    pros::lcd::print(3, "right :  %d\n", rightEncoder.get_position());
+    pros::lcd::print(4, "middle :  %d\n", middleEncoder.get_position());
     pros::lcd::print(5, "rotation :  %f\n", gPosition.a);
 
     pros::delay(5);
