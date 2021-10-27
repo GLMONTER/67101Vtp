@@ -1,12 +1,17 @@
 #include "main.h"
 
-pros::IMU gyro(2);
+pros::IMU gyro(5);
 extern void trackPosition();
 void initialize() 
 {
     gyro.reset();
+    while (gyro.is_calibrating())
+    {
+        pros::delay(10);
+    }
+    
     pros::lcd::initialize();
-	pros::Task trackingTask(trackPosition);
+	//pros::Task trackingTask(trackPosition);
 }
 pros::Distance rightDistanceSensor(5);
 pros::Distance leftDistanceSensor(19); 
@@ -80,7 +85,7 @@ void maintainDistanceFromWall()
 }
 void maintainRotation()
 {
-    pros::lcd::print(2, "left :  %d\n", gyro.get_yaw());
+    pros::lcd::print(2, "left :  %f\n", gyro.get_yaw());
 }
 void climb()
 {
