@@ -25,12 +25,12 @@ extern pros::Motor leftBack;
 extern pros::Motor rightFront;
 extern pros::Motor leftFront;
 
-extern pros::Motor topTwist;
 
-
-extern pros::Motor cascade;
-extern pros::Motor ringFlip;
 extern pros::Motor intake;
 extern pros::Motor frontGoalLift;
-extern pros::Motor rearGoalLift;
+extern pros::Motor rearGoalLiftLeft;
+extern pros::Motor rearGoalLiftRight;
+
+
+extern pros::IMU gyro;
 

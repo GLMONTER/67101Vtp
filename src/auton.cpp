@@ -1,14 +1,6 @@
 #include"main.h"
 
 bool runningAuton = false;
-/*
-auto chassis = ChassisControllerBuilder()
-    .withMotors({8, 20}, {1, 11}) // Left motor is 1, right motor is 2 (reversed)
-    // Green gearset, 4 inch wheel diameter, 11.5 inch wheel track
-    .withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
-     // Use the same scales as the chassis (above)
-    .build();
-  */
 
 //tracking wheel diameter in inches
 #define WHEEL_DIAM 2.783
@@ -31,21 +23,23 @@ typedef struct _pos
 	int backLst;
 } sPos; // Position of the robot
 
+
+struct PathPoint {
+    float x;
+    float y;
+    float w;
+  	float curvature;
+    float distance;
+};
+
 sPos gPosition;
 
-void winPoint()
-{
-    
-}
-
-void skills()
-{
-
-}
 
 pros::Rotation leftEncoder(1);
 pros::Rotation rightEncoder(2);
 pros::Rotation middleEncoder(3);
+
+pros::IMU gyro(5);
 
 void trackPosition()
 {    
@@ -135,46 +129,152 @@ float getNewPID(const float error)
     return (integral*Ki) + (derivative*Kd) + (error*Kp);
 }
 
-void moveToPoint(const float x, const float y, const float angle, bool goThroughFlag, const uint32_t maxVelocity = 127, uint32_t timeout = 0)
+void gyroTurn(float deg)
 {
-	float positionTamper = 1.0f;
-	float angleTamper = 1.0f;
-	while(std::abs(gPosition.x - x) > positionTamper || std::abs(gPosition.y - y) > positionTamper || std::abs(gPosition.a - x) > angleTamper)
-	{
- 		//difference in rotation from current rotation to target rotation
-        float differenceOfAngle = (angle - gPosition.a);		 
+    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 
-		//the distance between the current position and the desired point plus the scaled angle
-		float scaleValue = std::abs(std::sqrt(std::abs(gPosition.x - x) + std::abs(gPosition.y - y))) + (3 * differenceOfAngle);
+    float error = 10.0;
+    float integral = 0.0;
+    float derivative = 0.0;
+    float perror = 0.0;
+    float value = 0.0;
 
-		//What direction to drive in
-        float T = std::atan2((y - gPosition.y), (x - gPosition.x)) + gPosition.a;
+    float target = deg;
+    float Ki = -0.0005;
+    float Kd = -1.0;
+    float Kp = -1.0;
 
-		//use pid to move elegantly to the target
-		float scaledPID = getNewPID(scaleValue);
-		
-		leftFront.move((sin(T + 1/4*PI) + differenceOfAngle) * scaledPID);
-		rightBack.move((sin(T + 1/4*PI) - differenceOfAngle) * scaledPID);
+    while (abs(error) > 0.1 || leftFront.get_actual_velocity() > 0.1)
+    {
+        pros::lcd::print(0, "val: %f\n", gyro.get_yaw());
+        error =  target - gyro.get_yaw();
+        printf("%f \n", error);
+        integral = integral + error;
+        if (abs(error) < 2)
+        {
+            integral = 0.0;
+        }
+        derivative = error - perror;
+        perror = error;
+        value = (integral*Ki) + (derivative*Kd) + (error*Kp);
 
-		rightFront.move((sin(T - 1/4*PI) - differenceOfAngle) * scaledPID);
-		leftBack.move((sin(T - 1/4*PI) + differenceOfAngle) * scaledPID);
+        leftBack.move(-value);
+        rightBack.move(value);
+        leftFront.move(-value);
+        rightFront.move(value);
 
-		pros::delay(5);
-	}
+        pros::delay(5);
+    }
 }
+void gyroDrive(float targetPitch)
+{
+    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+
+    float error = 10.0;
+    float integral = 0.0;
+    float derivative = 0.0;
+    float perror = 0.0;
+    float value = 0.0;
+
+    float target = targetPitch;
+    float Ki = -0.15;
+    float Kd = -0.75;
+    float Kp = -3.5;
+
+    while (abs(error) > 0.1 || leftFront.get_actual_velocity() > 0.1)
+    {
+        pros::lcd::print(0, "val: %f\n", gyro.get_pitch());
+        error =  target - gyro.get_pitch();
+       // printf("%f \n", error);
+        integral = integral + error;
+        if (abs(error) < 2)
+        {
+            integral = 0.0;
+        }
+        derivative = error - perror;
+        perror = error;
+        value = (integral*Ki) + (derivative*Kd) + (error*Kp);
+
+        leftBack.move(value);
+        rightBack.move(value);
+        leftFront.move(value);
+        rightFront.move(value);
+
+        pros::delay(10);
+    }
+}
+
+void gyroDriveTop(float targetPitch, int toLock)
+{
+    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+
+    float error = 10.0;
+    float integral = 0.0;
+    float derivative = 0.0;
+    float perror = 0.0;
+    float value = 0.0;
+
+    float target = targetPitch;
+    float Ki = -0.0125;
+    float Kd = -1;
+    float Kp = -0.5;
+
+    while (abs(error) > 0.1 || leftFront.get_actual_velocity() > 0.1)
+    {
+        pros::lcd::print(0, "val: %f\n", gyro.get_pitch());
+        error =  target - gyro.get_pitch();
+      //  printf("%f \n", error);
+        integral = integral + error;
+        if (abs(error) < 20)
+        {
+            integral = 0.0;
+        }
+        derivative = error - perror;
+        perror = error;
+        value = (integral*Ki) + (derivative*Kd) + (error*Kp);
+        if(std::abs(value) > 40)
+        {
+            leftBack.move_velocity(40);
+            rightBack.move_velocity(40);
+            leftFront.move_velocity(40);
+            rightFront.move_velocity(40);
+        }
+        else
+        {
+            leftBack.move(-value);
+            rightBack.move(-value);
+            leftFront.move(-value);
+            rightFront.move(-value);
+        }
+         
+            
+        pros::delay(10);
+    }
+    leftBack.move_velocity(0);
+    rightBack.move_velocity(0);
+    leftFront.move_velocity(0);
+    rightFront.move_velocity(0);
+}
+
+
 void init()
 {
     
 }
-void rightSide()
-{
 
-}
 //actually running the auton
 void runAuton()
 {
     runningAuton = true;
     init();
-    rightSide();
     runningAuton = false;
 }
