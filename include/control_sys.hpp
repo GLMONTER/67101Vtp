@@ -28,8 +28,8 @@ extern pros::Motor leftFront;
 
 extern pros::Motor intake;
 extern pros::Motor frontGoalLift;
-extern pros::Motor rearGoalLiftLeft;
-extern pros::Motor rearGoalLiftRight;
+extern pros::Motor claw;
+extern pros::Motor clawLift;
 
 
 extern pros::IMU gyro;

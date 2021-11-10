@@ -11,8 +11,8 @@ pros::Motor intake(1, pros::E_MOTOR_GEARSET_18, false);
 
 pros::Motor frontGoalLift(13, pros::E_MOTOR_GEARSET_36, false);
 
-pros::Motor rearGoalLiftRight(3, pros::E_MOTOR_GEARSET_36, false);
-pros::Motor rearGoalLiftLeft(2, pros::E_MOTOR_GEARSET_36, false);
+pros::Motor claw(3, pros::E_MOTOR_GEARSET_36, false);
+pros::Motor clawLift(2, pros::E_MOTOR_GEARSET_36, false);
 
 pros::ADIDigitalIn buttonLimit('H');
 //when enabled, systems like the goal lifts will check internal encoder position to make sure there is no 
@@ -57,35 +57,33 @@ void moveGoalLift()
     {
         frontGoalLift.move_velocity(0);
     }
-    pros::lcd::print(0, "%f", frontGoalLift.get_position());
- //lLift.get_position());
-    //rear goal lift
+   
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
     {
-        rearGoalLiftLeft.move(-127);
-        rearGoalLiftRight.move(127);
-
-        /*
-        rearGoalLiftLeft.move_absolute(0, 200);
-        rearGoalLiftRight.move_absolute(0, 200);
-        */
+        claw.move(127);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {
-        /*
-        rearGoalLiftLeft.move_absolute(-2000, 200);
-        rearGoalLiftRight.move_absolute(2000, 200);
-        */
-        rearGoalLiftLeft.move(127);
-        rearGoalLiftRight.move(-127);
+        claw.move(-127);
     }
     else
     {
-        rearGoalLiftLeft.move_velocity(0);
-        rearGoalLiftRight.move_velocity(0);
-
+        claw.move_velocity(0);
     }
-    //std::cout<<goalLift.get_position()<<std::endl;
+
+    //claw and claw lift
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+    {
+        clawLift.move(127);
+    }
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
+    {
+        clawLift.move(-127);
+    }
+    else
+    {
+        clawLift.move_velocity(0);
+    }
 }
 
 void setLoader(loaderSetting setting)
@@ -93,10 +91,11 @@ void setLoader(loaderSetting setting)
     if(setting == loaderSetting::Disabled)
         intake.move(0);
     else if(setting == loaderSetting::Intake)
-        intake.move_velocity(170);
+        intake.move_velocity(200);
     else if(setting == loaderSetting::Outake)
-        intake.move_velocity(-170);
-    pros::lcd::print(1, "%f", intake.get_temperature());
+        intake.move_velocity(-200);
+    pros::lcd::print(6, "%f", clawLift.get_position());
+    pros::lcd::print(7, "%f", claw.get_position());
 }
 
 void controlLoader()

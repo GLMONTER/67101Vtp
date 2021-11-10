@@ -7,11 +7,11 @@ bool runningAuton = false;
 //calculate how far the wheel will travel in one rotation
 float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 360.0);
 //distance from the left tracking wheel to tracking center
-#define L_DISTANCE_IN 7.5
+#define L_DISTANCE_IN 4.5
 //distance from the right tracking wheel to tracking center
-#define R_DISTANCE_IN 7.5
+#define R_DISTANCE_IN 4.5
 //distance from the rear tracking wheel to tracking center
-#define S_DISTANCE_IN 4.75
+#define S_DISTANCE_IN 2
 
 typedef struct _pos
 {
@@ -23,31 +23,31 @@ typedef struct _pos
 	int backLst;
 } sPos; // Position of the robot
 
-
-struct PathPoint {
-    float x;
-    float y;
-    float w;
-  	float curvature;
-    float distance;
-};
-
 sPos gPosition;
 
 
-pros::Rotation leftEncoder(1);
-pros::Rotation rightEncoder(2);
-pros::Rotation middleEncoder(3);
+pros::Rotation leftEncoder(17);
+pros::Rotation rightEncoder(4);
+pros::Rotation middleEncoder(18);
 
 pros::IMU gyro(5);
 
 void trackPosition()
 {    
+    middleEncoder.reverse();
+    leftEncoder.reset_position();
+    rightEncoder.reset_position();
+    middleEncoder.reset_position();
+
+    leftEncoder.set_data_rate(5);
+    rightEncoder.set_data_rate(5);
+    middleEncoder.set_data_rate(5);
+
     while(true)
     {
-    int32_t left = leftEncoder.get_position();
-    int32_t right = rightEncoder.get_position();
-    int32_t back = middleEncoder.get_position();
+    int32_t left = leftEncoder.get_position() / 100;
+    int32_t right = rightEncoder.get_position() / 100;
+    int32_t back = middleEncoder.get_position() / 100;
 
     float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
 	float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
@@ -95,9 +95,9 @@ void trackPosition()
     pros::lcd::print(0, "x :  %f\n", gPosition.x);
     pros::lcd::print(1, "y :  %f\n", gPosition.y);
 
-    pros::lcd::print(2, "left :  %d\n", leftEncoder.get_position());
-    pros::lcd::print(3, "right :  %d\n", rightEncoder.get_position());
-    pros::lcd::print(4, "middle :  %d\n", middleEncoder.get_position());
+    pros::lcd::print(2, "left :  %d\n", leftEncoder.get_position() / 100);
+    pros::lcd::print(3, "right :  %d\n", rightEncoder.get_position() / 100);
+    pros::lcd::print(4, "middle :  %d\n", middleEncoder.get_position() / 100);
     pros::lcd::print(5, "rotation :  %f\n", gPosition.a);
 
     pros::delay(5);
@@ -112,9 +112,9 @@ float getNewPID(const float error)
     static float previousError;
     static float driveValue;
 
-    const float Ki = 0.1;
-    const float Kd = 3.0f;
-    const float Kp = 1.5f;
+    const float Ki = 0.15;
+    const float Kd = 2.5f;
+    const float Kp = 2.25f;
     //subject to change heading for yaw
     
     integral = integral + error;
@@ -270,11 +270,76 @@ void init()
 {
     
 }
+void moveToPoint(const float x, const float y, const float angle, bool goThroughFlag, const uint32_t maxVelocity = 127, uint32_t timeout = 0)
+{
+    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    
+	float positionTamper = 1.0f;
+	float angleTamper = 0.04f;
+	while(std::abs(gPosition.x - x) > positionTamper || std::abs(gPosition.y - y) > positionTamper || std::abs(gPosition.a - angle) > angleTamper)
+	{
+          
 
+ 		//difference in rotation from current rotation to target rotation
+        float differenceOfAngle = (angle - gPosition.a);		 
+            
+
+		//the distance between the current position and the desired point plus the scaled angle
+		float scaleValue = std::abs(std::sqrt(std::abs(gPosition.x - x) + std::abs(gPosition.y - y))) + (3 * differenceOfAngle);
+
+		//What direction to drive in
+        float T = std::atan2((y - gPosition.y), (x - gPosition.x)) + gPosition.a;
+        
+		//use pid to move elegantly to the target
+		float scaledPID = getNewPID(scaleValue);
+		
+		leftFront.move((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID);
+		rightBack.move((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID);
+
+		rightFront.move((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID);
+		leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID);
+
+		pros::delay(5);
+	}
+   
+
+    leftFront.move_velocity(0);
+    leftBack.move_velocity(0);
+    rightFront.move_velocity(0);
+    rightBack.move_velocity(0);
+}
 //actually running the auton
 void runAuton()
 {
     runningAuton = true;
     init();
+
+    clawLift.move_relative(-700, 200);
+    //move up to goal
+    moveToPoint(0, -3, 0, true, 200);
+    claw.move_relative(700, 200);
+
+    //move to side to get ready for straight away
+    moveToPoint(16, 0, 0, false, 200);
+    //go all of the way to the other side
+    moveToPoint(16, -60, 0, false, 200);
+    //align with goal for outake
+    moveToPoint(9, -85, 2.25, true, 200);
+    intake.move(127);
+    pros::delay(500);
+    intake.move(0);
+    //go in front of goal
+    moveToPoint(20, -75, 3.14, false, 200);
+    //go beside goal
+    moveToPoint(30, -88, 3.14, false, 200);
+    //push goal
+    moveToPoint(0, -88, 3.14, true, 200);
+
+
+
+    
     runningAuton = false;
 }
