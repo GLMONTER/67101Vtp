@@ -295,12 +295,54 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
         
 		//use pid to move elegantly to the target
 		float scaledPID = getNewPID(scaleValue);
-		
-		leftFront.move((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID);
-		rightBack.move((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID);
+		if(std::abs((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        {
+            if((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID > 0)
+                leftFront.move(maxVelocity);
+            else
+                leftFront.move(-maxVelocity);
+        }
+        else
+        {
+            leftFront.move((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID);
+        }
+        //right Back
+        if(std::abs((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        {
+            if(((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID) > 0)
+                rightBack.move(maxVelocity);
+            else
+                rightBack.move(-maxVelocity);
+        }
+        else
+        {
+            rightBack.move((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID);
+        }
+        //right Front
 
-		rightFront.move((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID);
-		leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID);
+        if(std::abs((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        {
+            if((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID > 0)
+                rightFront.move(maxVelocity);
+            else
+                rightFront.move(-maxVelocity);
+        }
+        else
+        {
+            rightFront.move((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID);
+        }
+        //left Back
+        if(std::abs((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        {
+            if((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID > 0)
+                leftBack.move(maxVelocity);
+            else
+                leftBack.move(-maxVelocity);
+        }
+        else
+        {
+            leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID);
+        }
 
 		pros::delay(5);
 	}
@@ -311,12 +353,8 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
     rightFront.move_velocity(0);
     rightBack.move_velocity(0);
 }
-//actually running the auton
-void runAuton()
+void winPoint()
 {
-    runningAuton = true;
-    init();
-
     clawLift.move_relative(-700, 200);
     //move up to goal
     moveToPoint(0, -3, 0, true, 200);
@@ -337,7 +375,34 @@ void runAuton()
     moveToPoint(30, -88, 3.14, false, 200);
     //push goal
     moveToPoint(0, -88, 3.14, true, 200);
+}
+void rightQuali()
+{
+    clawLift.move_relative(-700, 200);
+    //move up to goal
+    moveToPoint(0, -3, 0, true, 200);
+    claw.move_relative(700, 200);
 
+    moveToPoint(12, 0, 0, true, 200);
+    moveToPoint(12, -30, 0, true, 200);
+    moveToPoint(-2, -30, 0, true, 200);
+    moveToPoint(-1, -18, 0, true, 200);
+    moveToPoint(18, -33, 0, true, 127);
+    pros::delay(1000);
+    clawLift.move_relative(-300, 100);
+    moveToPoint(18, -38, 0, true, 50);
+    //clamp
+    claw.move_relative(-800, 200);
+    pros::delay(1000);
+    moveToPoint(21, 0, 0, true, 200);
+}
+//actually running the auton
+void runAuton()
+{
+    runningAuton = true;
+    init();
+
+    rightQuali();
 
 
     
