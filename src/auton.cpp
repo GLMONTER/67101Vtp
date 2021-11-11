@@ -112,9 +112,9 @@ float getNewPID(const float error)
     static float previousError;
     static float driveValue;
 
-    const float Ki = 0.15;
-    const float Kd = 2.5f;
-    const float Kp = 2.25f;
+    const float Ki = 0.1;
+    const float Kd = 0.0f;
+    const float Kp = 1.75f;
     //subject to change heading for yaw
     
     integral = integral + error;
@@ -380,22 +380,43 @@ void rightQuali()
 {
     clawLift.move_relative(-700, 200);
     //move up to goal
-    moveToPoint(0, -3, 0, true, 200);
-    claw.move_relative(700, 200);
+    moveToPoint(0, -4, 0, true, 200);
+    claw.move_relative(1000, 200);
+    pros::delay(500);
 
     moveToPoint(12, 0, 0, true, 200);
-    moveToPoint(12, -30, 0, true, 200);
-    moveToPoint(-2, -30, 0, true, 200);
-    moveToPoint(-1, -18, 0, true, 200);
+    moveToPoint(12, -30, 0, true, 90);
+    moveToPoint(-2, -30, 0, true, 90);
+    moveToPoint(-1, -18, 0, true, 90);
     moveToPoint(18, -33, 0, true, 127);
-    pros::delay(1000);
+    
     clawLift.move_relative(-300, 100);
-    moveToPoint(18, -38, 0, true, 50);
+    moveToPoint(18, -40, 0, true, 75);
     //clamp
-    claw.move_relative(-800, 200);
+    claw.move_relative(-1300, 200);
     pros::delay(1000);
-    moveToPoint(21, 0, 0, true, 200);
+    clawLift.move_relative(-100, 100);
+
+    moveToPoint(22, 0, 0, true, 200);
 }
+void leftQuali()
+{
+    clawLift.move_relative(-700, 200);
+    //move up to goal
+  
+    moveToPoint(0, -3, 0, true, 127);
+    claw.move_relative(1000, 200);
+    pros::delay(500);
+    moveToPoint(29.5, -16, -1.45, true, 200);
+    clawLift.move_relative(-300, 100);
+    moveToPoint(40.5, -16.5, -1.45, true, 75);
+    claw.move_relative(-1200, 200);
+    pros::delay(1000);
+    clawLift.move_relative(-400, 100);
+    moveToPoint(4, -3, -1.28, true, 100);
+
+}
+//void leftElim
 //actually running the auton
 void runAuton()
 {
