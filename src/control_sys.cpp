@@ -15,40 +15,100 @@ pros::Motor claw(3, pros::E_MOTOR_GEARSET_36, false);
 pros::Motor clawLift(2, pros::E_MOTOR_GEARSET_36, false);
 
 pros::ADIDigitalIn buttonLimit('H');
-//when enabled, systems like the goal lifts will check internal encoder position to make sure there is no 
-//mechanical damage from rotating the mechanism too far
-#define ENABLE_CHECKS false
+//allow macro systems to be overrided
+bool overrideFlag = false;
+//to check if we are running the auton, for use in the multithreaded task
+extern bool runningAuton;
 
-enum CheckStates 
+void threadMacro()
 {
-    larger = 0,
-    smaller = 1,
-    correct = 2
-};
+    int state = 0;
 
-void setDrive(const int32_t leftPower, const int32_t rightPower)
-{
-    rightBack.move(rightPower);
-    leftBack.move(leftPower);
-}
-//generic function to verify positions of mechanims that can break when over-rotated.
-int checkPosition(int32_t topValue, int32_t botValue, int32_t currentValue)
-{
-    if(currentValue > topValue)
-        return CheckStates::larger;
-    if(currentValue < botValue)
-        return CheckStates::smaller;
-    else
-        return CheckStates::correct;
+    int upPressed = 0;
+    int upToggle = 0;
+
+    int downPressed = 0;
+    int downToggle = 0;
+
+    while(true)
+    {
+        pros::lcd::print(8, "%f", clawLift.get_position());
+        if(overrideFlag || runningAuton)
+        {
+            continue;
+        }
+        //up toggle
+        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+        {
+            if(!upPressed)
+            {
+                upToggle = 1 - upToggle;
+
+                upPressed = 1;
+            }
+        }
+        else
+            upPressed = 0;
+
+        //down toggle
+        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
+        {
+            if(!downPressed)
+            {
+                downToggle = 1 - downToggle;
+
+                downPressed = 1;
+            }
+        }
+        else
+            downPressed = 0;
+
+        //actually execute
+        if(upToggle)
+        {
+            if(state != 2)
+                state++;
+            upToggle = false;
+        }
+        if(downToggle)
+        {
+            if(state != 0)
+                state--;
+            downToggle = false;
+        }
+        //go to macro
+        if(state == 0)
+        {
+            clawLift.move_absolute(0, 200);
+        }
+        else if(state == 1)
+        {
+            clawLift.move_absolute(-1100, 200);
+        }
+        else if(state == 2)
+        {
+            clawLift.move_absolute(-3400, 200);
+        }
+        pros::delay(10);
+    }
 }
 
 void moveGoalLift()
 {
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+    //enables or disables the override flag to give the drive different controls.
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
+        overrideFlag = true;
+    if(overrideFlag && controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+        overrideFlag = false;
+
+    pros::lcd::print(7, "%f", claw.get_torque());
+
+    //check to make sure the front goal lift stays above its range
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2) && frontGoalLift.get_position() < 0)
     {
         frontGoalLift.move_velocity(127);
     }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
     {
         if(!buttonLimit.get_value())
             frontGoalLift.move_velocity(-127);
@@ -57,86 +117,34 @@ void moveGoalLift()
     {
         frontGoalLift.move_velocity(0);
     }
-   
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+    //move the claw
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
-        claw.move(127);
+        claw.move_absolute(-100, 200);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {
-        claw.move(-127);
+        claw.move_absolute(1000, 200);
     }
-    else
+    else if((claw.get_position() > 900 && claw.get_position() < 1100) || (claw.get_position() > -200 && claw.get_position() < 0))
     {
         claw.move_velocity(0);
     }
-
-    //claw and claw lift
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))
+    //if override is enabled, manually control claw lift
+    if(overrideFlag)
     {
-        clawLift.move(127);
+        //claw and claw lift
+        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
+        {
+            clawLift.move(-127);
+        }
+        else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
+        {
+            clawLift.move(127);
+        }
+        else
+        {
+            clawLift.move_velocity(0);
+        }
     }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
-    {
-        clawLift.move(-127);
-    }
-    else
-    {
-        clawLift.move_velocity(0);
-    }
-}
-
-void setLoader(loaderSetting setting)
-{
-    if(setting == loaderSetting::Disabled)
-        intake.move(0);
-    else if(setting == loaderSetting::Intake)
-        intake.move_velocity(200);
-    else if(setting == loaderSetting::Outake)
-        intake.move_velocity(-200);
-    pros::lcd::print(6, "%f", clawLift.get_position());
-    pros::lcd::print(7, "%f", claw.get_position());
-}
-
-void controlLoader()
-{   
-    static int reverseFlag = 0;
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
-    {
-        setLoader(loaderSetting::Intake);
-    }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
-    {
-        setLoader(loaderSetting::Outake);
-    }
-    else
-    {
-        setLoader(loaderSetting::Disabled);
-    }
-    
-}
-// static float error;
-static float integral;
-static float derivative;
-static float previousError;
-//generic PID function
-float getNewPIDCONTROL(const float error)
-{
-    const float Ki = 0.001;
-    const float Kd = 0.005f;
-    const float Kp = 0.001f;
-    //subject to change heading for yaw
-    
-    integral = integral + error;
-    
-    if(abs(error) < 5.0f)
-    {
-        integral = 0.0f;
-    }
-
-    derivative = error - previousError;
-    previousError = error;
-   // std::cout<<(integral*Ki) + (derivative*Kd) + (error*Kp)<<std::endl;
-    
-    return (integral*Ki) + (derivative*Kd) + (error*Kp);
 }

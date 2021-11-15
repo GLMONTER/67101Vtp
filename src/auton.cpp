@@ -30,21 +30,22 @@ pros::Rotation leftEncoder(17);
 pros::Rotation rightEncoder(4);
 pros::Rotation middleEncoder(18);
 
-pros::IMU gyro(5);
-
 void trackPosition()
 {    
     middleEncoder.reverse();
+    //reset position because position is a set state
     leftEncoder.reset_position();
     rightEncoder.reset_position();
     middleEncoder.reset_position();
 
+    //update encoders every 5 miliseconds
     leftEncoder.set_data_rate(5);
     rightEncoder.set_data_rate(5);
     middleEncoder.set_data_rate(5);
 
     while(true)
     {
+    //get encoder position based on a 360 tick rotation
     int32_t left = leftEncoder.get_position() / 100;
     int32_t right = rightEncoder.get_position() / 100;
     int32_t back = middleEncoder.get_position() / 100;
@@ -94,11 +95,12 @@ void trackPosition()
   
     pros::lcd::print(0, "x :  %f\n", gPosition.x);
     pros::lcd::print(1, "y :  %f\n", gPosition.y);
-
+    /*
     pros::lcd::print(2, "left :  %d\n", leftEncoder.get_position() / 100);
     pros::lcd::print(3, "right :  %d\n", rightEncoder.get_position() / 100);
     pros::lcd::print(4, "middle :  %d\n", middleEncoder.get_position() / 100);
-    pros::lcd::print(5, "rotation :  %f\n", gPosition.a);
+    */
+    pros::lcd::print(2, "rotation :  %f\n", gPosition.a);
 
     pros::delay(5);
     }
@@ -118,153 +120,16 @@ float getNewPID(const float error)
     //subject to change heading for yaw
     
     integral = integral + error;
-    /*
-    if(abs(error) < 0.25f)
+    
+    if(abs(error) < 1.0f)
     {
         integral = 0.0f;
     }
-*/
+
     derivative = error - previousError;
     previousError = error;
     return (integral*Ki) + (derivative*Kd) + (error*Kp);
 }
-
-void gyroTurn(float deg)
-{
-    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-
-    float error = 10.0;
-    float integral = 0.0;
-    float derivative = 0.0;
-    float perror = 0.0;
-    float value = 0.0;
-
-    float target = deg;
-    float Ki = -0.0005;
-    float Kd = -1.0;
-    float Kp = -1.0;
-
-    while (abs(error) > 0.1 || leftFront.get_actual_velocity() > 0.1)
-    {
-        pros::lcd::print(0, "val: %f\n", gyro.get_yaw());
-        error =  target - gyro.get_yaw();
-        printf("%f \n", error);
-        integral = integral + error;
-        if (abs(error) < 2)
-        {
-            integral = 0.0;
-        }
-        derivative = error - perror;
-        perror = error;
-        value = (integral*Ki) + (derivative*Kd) + (error*Kp);
-
-        leftBack.move(-value);
-        rightBack.move(value);
-        leftFront.move(-value);
-        rightFront.move(value);
-
-        pros::delay(5);
-    }
-}
-void gyroDrive(float targetPitch)
-{
-    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-
-    float error = 10.0;
-    float integral = 0.0;
-    float derivative = 0.0;
-    float perror = 0.0;
-    float value = 0.0;
-
-    float target = targetPitch;
-    float Ki = -0.15;
-    float Kd = -0.75;
-    float Kp = -3.5;
-
-    while (abs(error) > 0.1 || leftFront.get_actual_velocity() > 0.1)
-    {
-        pros::lcd::print(0, "val: %f\n", gyro.get_pitch());
-        error =  target - gyro.get_pitch();
-       // printf("%f \n", error);
-        integral = integral + error;
-        if (abs(error) < 2)
-        {
-            integral = 0.0;
-        }
-        derivative = error - perror;
-        perror = error;
-        value = (integral*Ki) + (derivative*Kd) + (error*Kp);
-
-        leftBack.move(value);
-        rightBack.move(value);
-        leftFront.move(value);
-        rightFront.move(value);
-
-        pros::delay(10);
-    }
-}
-
-void gyroDriveTop(float targetPitch, int toLock)
-{
-    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-
-    float error = 10.0;
-    float integral = 0.0;
-    float derivative = 0.0;
-    float perror = 0.0;
-    float value = 0.0;
-
-    float target = targetPitch;
-    float Ki = -0.0125;
-    float Kd = -1;
-    float Kp = -0.5;
-
-    while (abs(error) > 0.1 || leftFront.get_actual_velocity() > 0.1)
-    {
-        pros::lcd::print(0, "val: %f\n", gyro.get_pitch());
-        error =  target - gyro.get_pitch();
-      //  printf("%f \n", error);
-        integral = integral + error;
-        if (abs(error) < 20)
-        {
-            integral = 0.0;
-        }
-        derivative = error - perror;
-        perror = error;
-        value = (integral*Ki) + (derivative*Kd) + (error*Kp);
-        if(std::abs(value) > 40)
-        {
-            leftBack.move_velocity(40);
-            rightBack.move_velocity(40);
-            leftFront.move_velocity(40);
-            rightFront.move_velocity(40);
-        }
-        else
-        {
-            leftBack.move(-value);
-            rightBack.move(-value);
-            leftFront.move(-value);
-            rightFront.move(-value);
-        }
-         
-            
-        pros::delay(10);
-    }
-    leftBack.move_velocity(0);
-    rightBack.move_velocity(0);
-    leftFront.move_velocity(0);
-    rightFront.move_velocity(0);
-}
-
 
 void init()
 {
@@ -347,7 +212,7 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 		pros::delay(5);
 	}
    
-
+    //lock the drive after the movement
     leftFront.move_velocity(0);
     leftBack.move_velocity(0);
     rightFront.move_velocity(0);
@@ -359,6 +224,7 @@ void winPoint()
     //move up to goal
     moveToPoint(0, -3, 0, true, 200);
     claw.move_relative(700, 200);
+    pros::delay(350);
 
     //move to side to get ready for straight away
     moveToPoint(16, 0, 0, false, 200);
@@ -394,8 +260,8 @@ void rightQuali()
     moveToPoint(18, -40, 0, true, 75);
     //clamp
     claw.move_relative(-1300, 200);
-    pros::delay(1000);
-    clawLift.move_relative(-100, 100);
+    pros::delay(750);
+    clawLift.move_relative(-300, 100);
 
     moveToPoint(22, 0, 0, true, 200);
 }
@@ -404,28 +270,60 @@ void leftQuali()
     clawLift.move_relative(-700, 200);
     //move up to goal
   
-    moveToPoint(0, -3, 0, true, 127);
+    moveToPoint(0, -4, 0, true, 127);
     claw.move_relative(1000, 200);
-    pros::delay(500);
+    pros::delay(600);
     moveToPoint(29.5, -16, -1.45, true, 200);
     clawLift.move_relative(-300, 100);
     moveToPoint(40.5, -16.5, -1.45, true, 75);
+    //clamp
     claw.move_relative(-1200, 200);
-    pros::delay(1000);
+    pros::delay(750);
     clawLift.move_relative(-400, 100);
     moveToPoint(4, -3, -1.28, true, 100);
 
 }
-//void leftElim
+
+void skills()
+{
+    frontGoalLift.move_absolute(-4000, 200);
+    pros::delay(3000);
+    moveToPoint(-73, 13, -1.45, false, 127);
+    moveToPoint(-79, 13, 0, false, 127);
+    frontGoalLift.move_absolute(0, 200);
+    pros::delay(2000);
+    moveToPoint(-94, -35, 1.45, true, 127);
+    moveToPoint(-19, -23, 1.45, true, 127);
+    moveToPoint(-28, 7, 1.45, true, 127);
+    moveToPoint(-74, 4, 1.45, true, 127);
+    moveToPoint(-68, 19.5, 1.45, true, 127);
+    moveToPoint(-34, 25, 1.45, true, 127);
+}
+void leftElim()
+{
+    moveToPoint(6, 34.5, 0, true, 127);
+    moveToPoint(6, 38, 0, true, 70);
+    frontGoalLift.move_absolute(-3000, 200);
+    
+    pros::delay(1500);
+    moveToPoint(27.3, 42, -1.45, true, 127);
+    moveToPoint(27, 42, -1.45, true, 80);
+    clawLift.move_absolute(-1100, 200);
+    claw.move_relative(1200, 200);
+    //clamp
+    claw.move_relative(-1200, 200);
+    pros::delay(750);
+    clawLift.move_relative(-400, 100);
+    moveToPoint(21, 16, -1.45, true, 127);
+    
+}
 //actually running the auton
 void runAuton()
 {
     runningAuton = true;
     init();
 
-    rightQuali();
+    leftElim();
 
-
-    
     runningAuton = false;
 }

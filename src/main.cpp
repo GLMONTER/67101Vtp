@@ -1,21 +1,15 @@
 #include "main.h"
 
-
 extern void trackPosition();
+extern void threadMacro();
+
 void initialize() 
 {
-    /*
-    gyro.reset();
-    while (gyro.is_calibrating())
-    {
-        pros::delay(10);
-    }
-    */
     pros::lcd::initialize();
+
 	pros::Task trackingTask(trackPosition);
+    pros::Task macroTask(threadMacro);
 }
-
-
 
 void disabled() {}
 
@@ -41,17 +35,17 @@ void opcontrol()
     while(true)
     {
         int Ch1 = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-        int Ch3 = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-        int Ch4 = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
+        int Ch3 = -controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        int Ch4 = -controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
 
         leftFront.move(Ch3 + Ch1 + Ch4);
         leftBack.move(Ch3 + Ch1 - Ch4);
         rightFront.move(Ch3 - Ch1 - Ch4);
         rightBack.move(Ch3 - Ch1 + Ch4);
         
-        
+        intake.move(127);
+
         moveGoalLift();
-        controlLoader();
         pros::delay(10);
     }
 }
