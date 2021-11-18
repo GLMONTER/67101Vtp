@@ -29,12 +29,12 @@ void threadMacro()
 
     int downPressed = 0;
     int downToggle = 0;
-
+    
     while(true)
     {
-        pros::lcd::print(8, "%f", clawLift.get_position());
         if(overrideFlag || runningAuton)
         {
+            pros::delay(10);
             continue;
         }
         //up toggle
@@ -66,7 +66,7 @@ void threadMacro()
         //actually execute
         if(upToggle)
         {
-            if(state != 2)
+            if(state != 3)
                 state++;
             upToggle = false;
         }
@@ -83,11 +83,15 @@ void threadMacro()
         }
         else if(state == 1)
         {
-            clawLift.move_absolute(-1100, 200);
+            clawLift.move_absolute(-1200, 200);
         }
         else if(state == 2)
         {
-            clawLift.move_absolute(-3400, 200);
+            clawLift.move_absolute(-3200, 200);
+        }
+        else if(state == 3)
+        {
+            clawLift.move_absolute(-4000, 200);
         }
         pros::delay(10);
     }
@@ -124,9 +128,9 @@ void moveGoalLift()
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {
-        claw.move_absolute(1000, 200);
+        claw.move_absolute(1300, 200);
     }
-    else if((claw.get_position() > 900 && claw.get_position() < 1100) || (claw.get_position() > -200 && claw.get_position() < 0))
+    else if((claw.get_position() > 1200 && claw.get_position() < 1400) || (claw.get_position() > -200 && claw.get_position() < -50))
     {
         claw.move_velocity(0);
     }

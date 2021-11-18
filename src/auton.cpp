@@ -39,16 +39,16 @@ void trackPosition()
     middleEncoder.reset_position();
 
     //update encoders every 5 miliseconds
-    leftEncoder.set_data_rate(5);
-    rightEncoder.set_data_rate(5);
-    middleEncoder.set_data_rate(5);
+    leftEncoder.set_data_rate(10);
+    rightEncoder.set_data_rate(10);
+    middleEncoder.set_data_rate(10);
 
     while(true)
     {
     //get encoder position based on a 360 tick rotation
-    int32_t left = leftEncoder.get_position() / 100;
-    int32_t right = rightEncoder.get_position() / 100;
-    int32_t back = middleEncoder.get_position() / 100;
+    float left = leftEncoder.get_position() / 100;
+    float right = rightEncoder.get_position() / 100;
+    float back = middleEncoder.get_position() / 100;
 
     float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
 	float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
@@ -95,14 +95,15 @@ void trackPosition()
   
     pros::lcd::print(0, "x :  %f\n", gPosition.x);
     pros::lcd::print(1, "y :  %f\n", gPosition.y);
-    /*
+    
     pros::lcd::print(2, "left :  %d\n", leftEncoder.get_position() / 100);
     pros::lcd::print(3, "right :  %d\n", rightEncoder.get_position() / 100);
     pros::lcd::print(4, "middle :  %d\n", middleEncoder.get_position() / 100);
-    */
+    
     pros::lcd::print(2, "rotation :  %f\n", gPosition.a);
-
-    pros::delay(5);
+    
+    
+    pros::delay(10);
     }
 }
 
@@ -146,18 +147,15 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 	float angleTamper = 0.04f;
 	while(std::abs(gPosition.x - x) > positionTamper || std::abs(gPosition.y - y) > positionTamper || std::abs(gPosition.a - angle) > angleTamper)
 	{
-          
-
  		//difference in rotation from current rotation to target rotation
         float differenceOfAngle = (angle - gPosition.a);		 
             
-
 		//the distance between the current position and the desired point plus the scaled angle
-		float scaleValue = std::abs(std::sqrt(std::abs(gPosition.x - x) + std::abs(gPosition.y - y))) + (3 * differenceOfAngle);
-
+		float scaleValue = std::abs(std::sqrt(std::pow((gPosition.x - x), 2) + std::pow((gPosition.y - y), 2))) + (3 * differenceOfAngle);
 		//What direction to drive in
         float T = std::atan2((y - gPosition.y), (x - gPosition.x)) + gPosition.a;
-        
+       
+
 		//use pid to move elegantly to the target
 		float scaledPID = getNewPID(scaleValue);
 		if(std::abs((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID) > maxVelocity)
@@ -209,7 +207,7 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
             leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID);
         }
 
-		pros::delay(5);
+		pros::delay(10);
 	}
    
     //lock the drive after the movement
@@ -286,18 +284,27 @@ void leftQuali()
 
 void skills()
 {
-    frontGoalLift.move_absolute(-4000, 200);
-    pros::delay(3000);
-    moveToPoint(-73, 13, -1.45, false, 127);
-    moveToPoint(-79, 13, 0, false, 127);
-    frontGoalLift.move_absolute(0, 200);
-    pros::delay(2000);
-    moveToPoint(-94, -35, 1.45, true, 127);
-    moveToPoint(-19, -23, 1.45, true, 127);
-    moveToPoint(-28, 7, 1.45, true, 127);
-    moveToPoint(-74, 4, 1.45, true, 127);
-    moveToPoint(-68, 19.5, 1.45, true, 127);
-    moveToPoint(-34, 25, 1.45, true, 127);
+    frontGoalLift.move_absolute(-3800, 200);
+    pros::delay(1000);
+    moveToPoint(0, -5, 0, false, 70);
+    moveToPoint(-16, -3, 1.45, false, 70);
+    clawLift.move_absolute(-1200, 200);
+    claw.move_absolute(1300, 200);
+    moveToPoint(-41.5, -3, 1.45, false, 70);
+    claw.move_absolute(-100, 200);
+    pros::delay(700);
+    clawLift.move_absolute(-4000, 200);
+    pros::delay(1500);
+    moveToPoint(-30.5, 34.3, 4.1, false, 70);
+    clawLift.move_absolute(-3200, 200);
+    pros::delay(500);
+    claw.move_absolute(1300, 200);
+    pros::delay(500);
+    moveToPoint(-80, 33.75, -1.45, false, 70);
+    moveToPoint(-64, 45.7, 2.83, false, 80);
+    clawLift.move_absolute(-1200, 200);
+    claw.move_absolute(1300, 200);
+    moveToPoint(-57.44, 60.4, 2.83, false, 70);
 }
 void leftElim()
 {
@@ -323,7 +330,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    leftElim();
+    skills();
 
     runningAuton = false;
 }
