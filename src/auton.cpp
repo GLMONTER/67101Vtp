@@ -306,12 +306,12 @@ void leftQuali()
 void skills()
 {
     frontGoalLift.move_absolute(-3700, 200);
-    pros::delay(2500);
+    pros::delay(1500);
     moveToPoint(0, -6.8, 0, true, 80, 5000);
     moveToPoint(-18.5, 3, 1.57, true, 65, 5000);
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
-    moveToPoint(-42, 3, 1.57, false, 70, 5000);
+    moveToPoint(-42, 3, 1.57, false, 40, 5000);
     claw.move_absolute(-100, 200);
     pros::delay(700);
     clawLift.move_absolute(-4000, 200);
@@ -330,14 +330,14 @@ void skills()
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
     //go get last neutral
-    moveToPoint(-49, 47, 3.14, true, 70, 5000);
-    moveToPoint(-49, 57, 3.14, false, 60, 5000);
+    moveToPoint(-50.5, 47, 3.14, true, 70, 5000);
+    moveToPoint(-50.5, 57, 3.14, false, 65, 5000);
     claw.move_absolute(-100, 200);
     pros::delay(700);
     clawLift.move_absolute(-4000, 200);
     pros::delay(1500);
-    moveToPoint(-30, 30, 4.57, true, 60, 5000);
-    moveToPoint(-19, 30, 4.57, true, 60, 5000);
+    moveToPoint(-30, 30, 4.57, true, 65, 5000);
+    moveToPoint(-19, 30, 4.57, true, 65, 5000);
     //lay last neut down
     clawLift.move_absolute(-3200, 200);
     pros::delay(500);
@@ -349,17 +349,17 @@ void skills()
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
 
-    moveToPoint(-24, 77.7, 3.14, false, 60, 5000);
+    moveToPoint(-24, 77.7, 3.14, false, 65, 5000);
 
      claw.move_absolute(-100, 200);
 
     pros::delay(700);
-    moveToPoint(-24, 73, 3.14, false, 60, 5000);
+    moveToPoint(-24, 73, 3.14, false, 65, 5000);
     clawLift.move_absolute(-4000, 200);
 
     pros::delay(1500);
-    moveToPoint(-24, 73, 4.57, false, 60, 5000);
-    moveToPoint(-84.5, 77, 4.57, false, 60);
+    moveToPoint(-24, 73, 4.57, false, 70, 2000);
+    moveToPoint(-84.5, 77, 4.57, false, 90);
     
 }
 void leftElim()
