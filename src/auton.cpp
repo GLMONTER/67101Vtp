@@ -7,11 +7,11 @@ bool runningAuton = false;
 //calculate how far the wheel will travel in one rotation
 float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 360.0);
 //distance from the left tracking wheel to tracking center
-#define L_DISTANCE_IN 4.5
+#define L_DISTANCE_IN 4.025
 //distance from the right tracking wheel to tracking center
-#define R_DISTANCE_IN 4.5
+#define R_DISTANCE_IN 4.025
 //distance from the rear tracking wheel to tracking center
-#define S_DISTANCE_IN 2
+#define S_DISTANCE_IN 2.25
 
 typedef struct _pos
 {
@@ -39,9 +39,9 @@ void trackPosition()
     middleEncoder.reset_position();
 
     //update encoders every 5 miliseconds
-    leftEncoder.set_data_rate(10);
-    rightEncoder.set_data_rate(10);
-    middleEncoder.set_data_rate(10);
+    leftEncoder.set_data_rate(5);
+    rightEncoder.set_data_rate(5);
+    middleEncoder.set_data_rate(5);
 
     while(true)
     {
@@ -103,26 +103,30 @@ void trackPosition()
     pros::lcd::print(2, "rotation :  %f\n", gPosition.a);
     
     
-    pros::delay(10);
+    pros::delay(5);
     }
 }
 
-float getNewPID(const float error)
+float getNewPID(const float error, bool resetFlag)
 {
    // static float error;
     static float integral;
     static float derivative;
     static float previousError;
-    static float driveValue;
-
-    const float Ki = 0.1;
-    const float Kd = 0.0f;
-    const float Kp = 1.75f;
+    if(resetFlag)
+    {
+        integral = 0;
+        derivative = 0;
+        previousError = 0;
+    }
+    const float Ki = 0.125;
+    const float Kd = 0.1f;
+    const float Kp = 1.5f;
     //subject to change heading for yaw
     
     integral = integral + error;
     
-    if(abs(error) < 1.0f)
+    if(abs(error) < 0.5f)
     {
         integral = 0.0f;
     }
@@ -144,9 +148,14 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
     rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
     
 	float positionTamper = 1.0f;
-	float angleTamper = 0.04f;
+	float angleTamper = 0.05f;
+    bool resFlag = false;
+    int i = 0;
 	while(std::abs(gPosition.x - x) > positionTamper || std::abs(gPosition.y - y) > positionTamper || std::abs(gPosition.a - angle) > angleTamper)
 	{
+        i += 10;
+        if(i > timeout && timeout != 0)
+            break;
  		//difference in rotation from current rotation to target rotation
         float differenceOfAngle = (angle - gPosition.a);		 
             
@@ -154,67 +163,79 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 		float scaleValue = std::abs(std::sqrt(std::pow((gPosition.x - x), 2) + std::pow((gPosition.y - y), 2))) + (3 * differenceOfAngle);
 		//What direction to drive in
         float T = std::atan2((y - gPosition.y), (x - gPosition.x)) + gPosition.a;
-       
-
+       float scaledPID;
 		//use pid to move elegantly to the target
-		float scaledPID = getNewPID(scaleValue);
-		if(std::abs((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        if(!resFlag)
+		    scaledPID = getNewPID(scaleValue, true);
+        else
+            scaledPID = getNewPID(scaleValue, false);
+        resFlag = true;
+		if(std::abs((sin(T + 0.25*PI) + differenceOfAngle * 3) * scaledPID) > maxVelocity)
         {
-            if((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID > 0)
+            if((sin(T + 0.25*PI) + differenceOfAngle * 3) * scaledPID > 0)
                 leftFront.move(maxVelocity);
             else
                 leftFront.move(-maxVelocity);
         }
         else
         {
-            leftFront.move((sin(T + 0.25*PI) + differenceOfAngle * 2) * scaledPID);
+            leftFront.move((sin(T + 0.25*PI) + differenceOfAngle * 3) * scaledPID);
         }
         //right Back
-        if(std::abs((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        if(std::abs((sin(T + 0.25*PI) - differenceOfAngle * 3) * scaledPID) > maxVelocity)
         {
-            if(((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID) > 0)
+            if(((sin(T + 0.25*PI) - differenceOfAngle * 3) * scaledPID) > 0)
                 rightBack.move(maxVelocity);
             else
                 rightBack.move(-maxVelocity);
         }
         else
         {
-            rightBack.move((sin(T + 0.25*PI) - differenceOfAngle * 2) * scaledPID);
+            rightBack.move((sin(T + 0.25*PI) - differenceOfAngle * 3) * scaledPID);
         }
         //right Front
 
-        if(std::abs((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        if(std::abs((sin(T - 0.25*PI) - differenceOfAngle * 3) * scaledPID) > maxVelocity)
         {
-            if((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID > 0)
+            if((sin(T - 0.25*PI) - differenceOfAngle * 3) * scaledPID > 0)
                 rightFront.move(maxVelocity);
             else
                 rightFront.move(-maxVelocity);
         }
         else
         {
-            rightFront.move((sin(T - 0.25*PI) - differenceOfAngle * 2) * scaledPID);
+            rightFront.move((sin(T - 0.25*PI) - differenceOfAngle * 3) * scaledPID);
         }
         //left Back
-        if(std::abs((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID) > maxVelocity)
+        if(std::abs((sin(T - 0.25*PI) + differenceOfAngle * 3) * scaledPID) > maxVelocity)
         {
-            if((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID > 0)
+            if((sin(T - 0.25*PI) + differenceOfAngle * 3) * scaledPID > 0)
                 leftBack.move(maxVelocity);
             else
                 leftBack.move(-maxVelocity);
         }
         else
         {
-            leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 2) * scaledPID);
+            leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 3) * scaledPID);
         }
 
 		pros::delay(10);
 	}
-   
-    //lock the drive after the movement
-    leftFront.move_velocity(0);
-    leftBack.move_velocity(0);
-    rightFront.move_velocity(0);
-    rightBack.move_velocity(0);
+   if(!goThroughFlag)
+   {
+        //lock the drive after the movement
+        leftFront.move_velocity(0);
+        leftBack.move_velocity(0);
+        rightFront.move_velocity(0);
+        rightBack.move_velocity(0);
+   }
+   else
+   {
+        leftFront.move(0);
+        leftBack.move(0);
+        rightFront.move(0);
+        rightBack.move(0); 
+   }
 }
 void winPoint()
 {
@@ -284,27 +305,62 @@ void leftQuali()
 
 void skills()
 {
-    frontGoalLift.move_absolute(-3800, 200);
-    pros::delay(1000);
-    moveToPoint(0, -5, 0, false, 70);
-    moveToPoint(-16, -3, 1.45, false, 70);
+    frontGoalLift.move_absolute(-3700, 200);
+    pros::delay(2500);
+    moveToPoint(0, -6.8, 0, true, 80, 5000);
+    moveToPoint(-18.5, 3, 1.57, true, 65, 5000);
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
-    moveToPoint(-41.5, -3, 1.45, false, 70);
+    moveToPoint(-42, 3, 1.57, false, 70, 5000);
     claw.move_absolute(-100, 200);
     pros::delay(700);
     clawLift.move_absolute(-4000, 200);
     pros::delay(1500);
-    moveToPoint(-30.5, 34.3, 4.1, false, 70);
+    moveToPoint(-27, 1.6, 1.57, true, 60, 5000);
+    moveToPoint(-28, 35, 1.57, true, 70, 5000);
+    moveToPoint(-30, 35, 4.57, true, 60, 5000);
+    moveToPoint(-19, 35, 4.57, true, 60);
     clawLift.move_absolute(-3200, 200);
     pros::delay(500);
     claw.move_absolute(1300, 200);
-    pros::delay(500);
-    moveToPoint(-80, 33.75, -1.45, false, 70);
-    moveToPoint(-64, 45.7, 2.83, false, 80);
+    pros::delay(1000);
+    moveToPoint(-36, 32, 3.14, true, 70, 5000);
+    moveToPoint(-56, 31, 3.14, true, 70, 5000);
+    moveToPoint(-65, 31, 3.14, true, 70, 5000);
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
-    moveToPoint(-57.44, 60.4, 2.83, false, 70);
+    //go get last neutral
+    moveToPoint(-49, 47, 3.14, true, 70, 5000);
+    moveToPoint(-49, 57, 3.14, false, 60, 5000);
+    claw.move_absolute(-100, 200);
+    pros::delay(700);
+    clawLift.move_absolute(-4000, 200);
+    pros::delay(1500);
+    moveToPoint(-30, 30, 4.57, true, 60, 5000);
+    moveToPoint(-19, 30, 4.57, true, 60, 5000);
+    //lay last neut down
+    clawLift.move_absolute(-3200, 200);
+    pros::delay(500);
+    claw.move_absolute(1300, 200);
+    pros::delay(1000);
+
+    moveToPoint(-24, 67.6, 3.14, true, 70, 5000);
+
+    clawLift.move_absolute(-1200, 200);
+    claw.move_absolute(1300, 200);
+
+    moveToPoint(-24, 77.7, 3.14, false, 60, 5000);
+
+     claw.move_absolute(-100, 200);
+
+    pros::delay(700);
+    moveToPoint(-24, 73, 3.14, false, 60, 5000);
+    clawLift.move_absolute(-4000, 200);
+
+    pros::delay(1500);
+    moveToPoint(-24, 73, 4.57, false, 60, 5000);
+    moveToPoint(-84.5, 77, 4.57, false, 60);
+    
 }
 void leftElim()
 {
@@ -329,7 +385,6 @@ void runAuton()
 {
     runningAuton = true;
     init();
-
     skills();
 
     runningAuton = false;
