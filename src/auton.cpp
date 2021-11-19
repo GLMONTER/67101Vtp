@@ -320,18 +320,22 @@ void skills()
     moveToPoint(-28, 35, 1.57, true, 70, 5000);
     moveToPoint(-30, 35, 4.57, true, 60, 5000);
     moveToPoint(-19, 35, 4.57, true, 60);
+
     clawLift.move_absolute(-3200, 200);
     pros::delay(500);
     claw.move_absolute(1300, 200);
     pros::delay(1000);
-    moveToPoint(-36, 32, 3.14, true, 70, 5000);
-    moveToPoint(-56, 31, 3.14, true, 70, 5000);
-    moveToPoint(-65, 31, 3.14, true, 70, 5000);
+
+    moveToPoint(-36, 32, 3.14, true, 80, 5000);
+    //moveToPoint(-56, 31, 3.14, true, 70, 5000);
+    moveToPoint(-65, 31, 3.14, true, 80, 5000);
+
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
     //go get last neutral
-    moveToPoint(-50.5, 47, 3.14, true, 70, 5000);
-    moveToPoint(-50.5, 57, 3.14, false, 65, 5000);
+    moveToPoint(-50.5, 55, 3.14, true, 70, 5000);
+    moveToPoint(-50.5, 59, 3.14, false, 65, 5000);
+
     claw.move_absolute(-100, 200);
     pros::delay(700);
     clawLift.move_absolute(-4000, 200);
@@ -344,7 +348,10 @@ void skills()
     claw.move_absolute(1300, 200);
     pros::delay(1000);
 
-    moveToPoint(-24, 67.6, 3.14, true, 70, 5000);
+    //moveToPoint(-24, 67.6, 3.14, true, 70, 5000);
+    moveToPoint(-24, 65, 3.14, true, 70, 5000);
+    moveToPoint(-28, 70, 2.5, true, 70, 5000);
+    moveToPoint(-24, 65, 3.14, true, 70, 5000);
 
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
@@ -359,7 +366,7 @@ void skills()
 
     pros::delay(1500);
     moveToPoint(-24, 73, 4.57, false, 70, 2000);
-    moveToPoint(-84.5, 77, 4.57, false, 90);
+    moveToPoint(-90, 77, 4.57, false, 90);
     
 }
 void leftElim()
