@@ -121,10 +121,11 @@ void moveGoalLift()
     {
         frontGoalLift.move_velocity(0);
     }
+    
     //move the claw
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
-        claw.move_absolute(-100, 200);
+        claw.move_absolute(-500, 200);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {

@@ -1,7 +1,7 @@
 #include"main.h"
 
 bool runningAuton = false;
-
+#define Win true
 //tracking wheel diameter in inches
 #define WHEEL_DIAM 2.783
 //calculate how far the wheel will travel in one rotation
@@ -119,9 +119,15 @@ float getNewPID(const float error, bool resetFlag)
         derivative = 0;
         previousError = 0;
     }
+    #if Win
     const float Ki = 0.125;
     const float Kd = 0.1f;
     const float Kp = 1.5f;
+    #else
+    const float Ki = 0.3;
+    const float Kd = 0.1f;
+    const float Kp = 2.0f;
+    #endif
     //subject to change heading for yaw
     
     integral = integral + error;
@@ -170,53 +176,53 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
         else
             scaledPID = getNewPID(scaleValue, false);
         resFlag = true;
-		if(std::abs((sin(T + 0.25*PI) + differenceOfAngle * 3) * scaledPID) > maxVelocity)
+		if(std::abs((sin(T + 0.25*PI) + differenceOfAngle * 4) * scaledPID) > maxVelocity)
         {
-            if((sin(T + 0.25*PI) + differenceOfAngle * 3) * scaledPID > 0)
+            if((sin(T + 0.25*PI) + differenceOfAngle * 4) * scaledPID > 0)
                 leftFront.move(maxVelocity);
             else
                 leftFront.move(-maxVelocity);
         }
         else
         {
-            leftFront.move((sin(T + 0.25*PI) + differenceOfAngle * 3) * scaledPID);
+            leftFront.move((sin(T + 0.25*PI) + differenceOfAngle * 4) * scaledPID);
         }
         //right Back
-        if(std::abs((sin(T + 0.25*PI) - differenceOfAngle * 3) * scaledPID) > maxVelocity)
+        if(std::abs((sin(T + 0.25*PI) - differenceOfAngle * 4) * scaledPID) > maxVelocity)
         {
-            if(((sin(T + 0.25*PI) - differenceOfAngle * 3) * scaledPID) > 0)
+            if(((sin(T + 0.25*PI) - differenceOfAngle * 4) * scaledPID) > 0)
                 rightBack.move(maxVelocity);
             else
                 rightBack.move(-maxVelocity);
         }
         else
         {
-            rightBack.move((sin(T + 0.25*PI) - differenceOfAngle * 3) * scaledPID);
+            rightBack.move((sin(T + 0.25*PI) - differenceOfAngle * 4) * scaledPID);
         }
         //right Front
 
-        if(std::abs((sin(T - 0.25*PI) - differenceOfAngle * 3) * scaledPID) > maxVelocity)
+        if(std::abs((sin(T - 0.25*PI) - differenceOfAngle * 4) * scaledPID) > maxVelocity)
         {
-            if((sin(T - 0.25*PI) - differenceOfAngle * 3) * scaledPID > 0)
+            if((sin(T - 0.25*PI) - differenceOfAngle * 4) * scaledPID > 0)
                 rightFront.move(maxVelocity);
             else
                 rightFront.move(-maxVelocity);
         }
         else
         {
-            rightFront.move((sin(T - 0.25*PI) - differenceOfAngle * 3) * scaledPID);
+            rightFront.move((sin(T - 0.25*PI) - differenceOfAngle * 4) * scaledPID);
         }
         //left Back
-        if(std::abs((sin(T - 0.25*PI) + differenceOfAngle * 3) * scaledPID) > maxVelocity)
+        if(std::abs((sin(T - 0.25*PI) + differenceOfAngle * 4) * scaledPID) > maxVelocity)
         {
-            if((sin(T - 0.25*PI) + differenceOfAngle * 3) * scaledPID > 0)
+            if((sin(T - 0.25*PI) + differenceOfAngle * 4) * scaledPID > 0)
                 leftBack.move(maxVelocity);
             else
                 leftBack.move(-maxVelocity);
         }
         else
         {
-            leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 3) * scaledPID);
+            leftBack.move((sin(T - 0.25*PI) + differenceOfAngle * 4) * scaledPID);
         }
 
 		pros::delay(10);
@@ -237,99 +243,128 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
         rightBack.move(0); 
    }
 }
+void winPointold()
+{
+     frontGoalLift.move_absolute(-3700, 200);
+    pros::delay(1500);
+    intake.move(127);
+    moveToPoint(0, -6.8, 0, true, 80, 3000);
+    intake.move(0);
+  //  moveToPoint(-24, -6.8, 0, true, 100, 3000);
+    moveToPoint(-20, -6.8, 3.14, true, 80, 3000);
+    clawLift.move_absolute(-1200, 200);
+    moveToPoint(-20, 72, 3.14, true, 90, 5000);
+    claw.move_absolute(1300, 200);
+    pros::delay(500);
+    moveToPoint(-38, 72, 3.14, true, 80, 3000);
+    moveToPoint(-38, 80, 3.14, true, 80, 3000);
+    moveToPoint(-14, 80, 3.14, true, 80, 3000);
+}
 void winPoint()
 {
-    clawLift.move_relative(-700, 200);
-    //move up to goal
-    moveToPoint(0, -3, 0, true, 200);
-    claw.move_relative(700, 200);
-    pros::delay(350);
-
-    //move to side to get ready for straight away
-    moveToPoint(16, 0, 0, false, 200);
-    //go all of the way to the other side
-    moveToPoint(16, -60, 0, false, 200);
-    //align with goal for outake
-    moveToPoint(9, -85, 2.25, true, 200);
+    frontGoalLift.move_absolute(-3800, 200);
+    pros::delay(800);
     intake.move(127);
-    pros::delay(500);
+    moveToPoint(0, -4.8, 0, true, 80, 3000);
     intake.move(0);
-    //go in front of goal
-    moveToPoint(20, -75, 3.14, false, 200);
-    //go beside goal
-    moveToPoint(30, -88, 3.14, false, 200);
-    //push goal
-    moveToPoint(0, -88, 3.14, true, 200);
+  //  moveToPoint(-24, -6.8, 0, true, 100, 3000);
+    moveToPoint(-20, -4.8, 3.14, true, 80, 3000);
+    clawLift.move_absolute(-1200, 200);
+    moveToPoint(-16.5, 74.5, 3.14, true, 85, 4000);
+    claw.move_absolute(1300, 200);
+    pros::delay(500);
+    moveToPoint(-33, 66, 1.57, true, 100, 2000);
+    moveToPoint(-40, 69, 1.57, true, 90, 1500);
+    claw.move_absolute(-300, 200);
+    pros::delay(500);
+    clawLift.move_absolute(-3000, 200);
+    //moveToPoint(-40, 66, 0.82, true, 100, 3000);
+    moveToPoint(-8, 87, 1, true, 127, 3000);
+    frontGoalLift.move_absolute(-3000, 200);
 }
 void rightQuali()
 {
-    clawLift.move_relative(-700, 200);
-    //move up to goal
-    moveToPoint(0, -4, 0, true, 200);
-    claw.move_relative(1000, 200);
-    pros::delay(500);
-
-    moveToPoint(12, 0, 0, true, 200);
-    moveToPoint(12, -30, 0, true, 90);
-    moveToPoint(-2, -30, 0, true, 90);
-    moveToPoint(-1, -18, 0, true, 90);
-    moveToPoint(18, -33, 0, true, 127);
     
-    clawLift.move_relative(-300, 100);
-    moveToPoint(18, -40, 0, true, 75);
-    //clamp
-    claw.move_relative(-1300, 200);
+}
+void rightElim()
+{
+    frontGoalLift.move_relative(-3200, 200);
+    moveToPoint(0, 38, 0, true, 80, 2000);
+    frontGoalLift.move_relative(1000, 200);
+    pros::delay(800);
+    moveToPoint(0, 18, 0, true, 110, 2000);
+    moveToPoint(0, 18, 2, true, 110, 2000);
+    frontGoalLift.move_relative(-1000, 200);
     pros::delay(750);
-    clawLift.move_relative(-300, 100);
-
-    moveToPoint(22, 0, 0, true, 200);
+    intake.move(127);
+    moveToPoint(-28, 23.5, 3.14, true, 110, 2000);
+    moveToPoint(-28, 23.5, 6.28, true, 110, 2000);
+    moveToPoint(-30.5, 38, 6.28, true, 110, 2000);
+    frontGoalLift.move_relative(1000, 200);
+    pros::delay(750);
+    moveToPoint(-30.5, 18, 6.28, true, 110, 2000);
+    moveToPoint(-30.5, 18, 3.14, true, 110, 2000);
 }
 void leftQuali()
 {
-    clawLift.move_relative(-700, 200);
-    //move up to goal
-  
-    moveToPoint(0, -4, 0, true, 127);
-    claw.move_relative(1000, 200);
-    pros::delay(600);
-    moveToPoint(29.5, -16, -1.45, true, 200);
-    clawLift.move_relative(-300, 100);
-    moveToPoint(40.5, -16.5, -1.45, true, 75);
-    //clamp
-    claw.move_relative(-1200, 200);
-    pros::delay(750);
-    clawLift.move_relative(-400, 100);
-    moveToPoint(4, -3, -1.28, true, 100);
-
+    frontGoalLift.move_absolute(-3700, 200);
+    pros::delay(1200);
+    intake.move(127);
+    moveToPoint(0, -4.8, 0, true, 90, 5000);
+    moveToPoint(-18.5, 3, 1.57, true, 80, 5000);
+    clawLift.move_absolute(-1200, 200);
+    claw.move_absolute(1300, 200);
+    moveToPoint(-42, 5, 1.57, false, 90, 5000);
+    claw.move_absolute(-300, 200);
+    pros::delay(700);
+    clawLift.move_absolute(-1800, 200);
+    moveToPoint(-30, 5, 4, false, 90, 5000);
+     clawLift.move_absolute(-1200, 200);
+    claw.move_absolute(1300, 200);
+    pros::delay(400);
+    moveToPoint(-36, 2, 3.14, false, 90, 5000);
+    clawLift.move_absolute(-1200, 200);
+    claw.move_absolute(1300, 200);
+    moveToPoint(-32.8, 36.5, 1.57, true, 100, 3000);
+    //get mid
+    moveToPoint(-42, 35.5, 1.57, true, 100, 3000);
+    claw.move_absolute(-300, 200);
+    pros::delay(700);
+    clawLift.move_absolute(-1800, 200);
+    moveToPoint(-8, 42, 3.14, true, 127, 2000);
+    
+    
+   
 }
 
 void skills()
 {
     frontGoalLift.move_absolute(-3700, 200);
     pros::delay(1500);
-    moveToPoint(0, -6.8, 0, true, 80, 5000);
-    moveToPoint(-18.5, 3, 1.57, true, 65, 5000);
+    moveToPoint(0, -4.8, 0, true, 80, 5000);
+    moveToPoint(-18.5, 5, 1.57, true, 65, 5000);
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
-    moveToPoint(-42, 3, 1.57, false, 40, 5000);
+    moveToPoint(-42, 5, 1.57, false, 40, 5000);
     claw.move_absolute(-100, 200);
     pros::delay(700);
     clawLift.move_absolute(-4000, 200);
     pros::delay(1500);
-    moveToPoint(-27, 1.6, 1.57, true, 60, 5000);
-    moveToPoint(-28, 35, 1.57, true, 70, 5000);
-    moveToPoint(-30, 35, 4.57, true, 60, 5000);
-    moveToPoint(-19, 35, 4.57, true, 60);
+    moveToPoint(-27, 3.6, 1.57, true, 60, 5000);
+    moveToPoint(-28, 37, 1.57, true, 70, 5000);
+    moveToPoint(-30, 37, 4.57, true, 60, 5000);
+    moveToPoint(-19, 37, 4.57, true, 60, 2500);
 
     clawLift.move_absolute(-3200, 200);
     pros::delay(500);
     claw.move_absolute(1300, 200);
     pros::delay(1000);
 
-    moveToPoint(-36, 32, 3.14, true, 80, 5000);
+    moveToPoint(-36, 34, 3.14, true, 80, 5000);
     //moveToPoint(-56, 31, 3.14, true, 70, 5000);
-    moveToPoint(-65, 31, 3.14, true, 80, 5000);
-
+    moveToPoint(-75, 33, 3.14, true, 80, 7000);
+    moveToPoint(-25, 33, 3.14, true, 80, 7000);
+/*
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
     //go get last neutral
@@ -367,32 +402,39 @@ void skills()
     pros::delay(1500);
     moveToPoint(-24, 73, 4.57, false, 70, 2000);
     moveToPoint(-90, 77, 4.57, false, 90);
-    
+    */
 }
 void leftElim()
 {
-    moveToPoint(6, 34.5, 0, true, 127);
-    moveToPoint(6, 38, 0, true, 70);
-    frontGoalLift.move_absolute(-3000, 200);
-    
-    pros::delay(1500);
-    moveToPoint(27.3, 42, -1.45, true, 127);
-    moveToPoint(27, 42, -1.45, true, 80);
-    clawLift.move_absolute(-1100, 200);
-    claw.move_relative(1200, 200);
-    //clamp
-    claw.move_relative(-1200, 200);
+   frontGoalLift.move_relative(-3200, 200);
+   moveToPoint(0, 12, 0, true, 80, 2000);
+    moveToPoint(6, 38, 0, true, 70, 2000);
+    frontGoalLift.move_relative(1000, 200);
+    pros::delay(800);
+    moveToPoint(6, 18, 0, true, 110, 2000);
+    moveToPoint(6, 18, 2, true, 110, 2000);
+    frontGoalLift.move_relative(-1000, 200);
     pros::delay(750);
-    clawLift.move_relative(-400, 100);
-    moveToPoint(21, 16, -1.45, true, 127);
-    
+    intake.move(127);
+    moveToPoint(34, 23.5, 3.14, true, 110, 2000);
+    moveToPoint(34, 23.5, 6.28, true, 110, 2000);
+    moveToPoint(36.5, 37, 6.28, true, 110, 2000);
+    frontGoalLift.move_relative(1000, 200);
+    pros::delay(750);
+    moveToPoint(36.5, 18, 6.28, true, 110, 2000);
+    moveToPoint(36.5, 18, 3.14, true, 110, 2000);
+
+
+
+
+
 }
 //actually running the auton
 void runAuton()
 {
     runningAuton = true;
     init();
-    skills();
+    rightElim();
 
     runningAuton = false;
 }
