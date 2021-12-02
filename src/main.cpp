@@ -1,4 +1,5 @@
 #include "main.h"
+//for std::setpercision
 #include <iomanip>
 
 extern void trackPosition();
@@ -8,63 +9,8 @@ extern pros::Rotation leftEncoder;
 extern pros::Rotation middleEncoder;
 extern pros::Rotation rightEncoder;
 
-pros::Optical intakeDetect(6);
 int flag = true;
 
-void intakeSense()
-{
-    while(true)
-    {
-        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
-            break;
-        pros::delay(10);
-    }
-    flag = false;
-    intake.move_velocity(140);
-    intakeDetect.set_led_pwm(100);
-    while(true)
-    {
-        if(intakeDetect.get_hue() > 80)
-        {
-            static int temp  = intake.get_position();
-            intake.move_relative(700, 75);
-            while(std::abs(intake.get_position() - temp) < 300)
-            {
-                pros::delay(10);
-            }
-            temp = intake.get_position();
-            intake.move_relative(-500, 150);
-            while(std::abs(intake.get_position() - temp) < 150)
-            {
-                pros::delay(10);
-            }
-            intake.move_velocity(200);
-            pros::delay(1000);
-            intake.move_velocity(0);
-            break;
-        }
-        pros::delay(10);
-    }
-    flag = true;
-}
-void initialize() 
-{
-
-	//pros::Task trackingTask(trackPosition);
-    pros::Task macroTask(threadMacro);
-   // pros::Task intakeTask(intakeSense);
-}
-
-void disabled() {}
-
-void competition_initialize() {}
-
-extern void runAuton();
-
-void autonomous() 
-{
-    runAuton();
-}
 typedef struct _pos
 {
 	float a = 0;
@@ -74,33 +20,27 @@ typedef struct _pos
 	int rightLst = 0;
 	int backLst = 0;
 } sPos; // Position of the robot
-extern bool runningAuton;
+
 //for screen write
 extern sPos gPosition;
 
+
+extern bool runningAuton;
+
+//a structure that is filled with string stream
 struct outputPos
 {
     std::string x, y, a;
 };
 outputPos writerPos;
 
-void opcontrol() 
+//task to draw the ui on screen
+void drawUI()
 {
-    frontGoalLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    claw.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    clawLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    intake.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-
-    runningAuton = false;
-       
-
-   
-
-
-
     while(true)
     {
-        // Create an output string stream
+        /* This string stream code fills a struct with the tracking data and then truncates it to two decimal places*/
+         // Create an output string stream
         std::ostringstream streamOBJ;
         // Set Fixed -Point Notation
         streamOBJ << std::fixed;
@@ -120,85 +60,272 @@ void opcontrol()
         streamOBJ << gPosition.a;
         // Get string from output string stream
         writerPos.a = streamOBJ.str();
+        //clear the string stream
         streamOBJ.str("");
     
-    
-    lv_obj_t * obj2;
-    obj2 = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_align(obj2, nullptr, LV_ALIGN_IN_TOP_LEFT, 0, 0);    
-    lv_obj_set_style(obj2, &lv_style_btn_tgl_rel);                   
-    lv_obj_set_height(obj2, 272);
-    lv_obj_set_width(obj2, 240);
-    lv_obj_t * label;
- 
-    label = lv_label_create(obj2, NULL);
-    lv_label_set_text(label, "Tracking Data");
-    lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_MID, 0, 15);
+        //create the left box
+        lv_obj_t * leftBox;
+        leftBox = lv_obj_create(lv_scr_act(), NULL);
+        lv_obj_align(leftBox, nullptr, LV_ALIGN_IN_TOP_LEFT, 0, 0);    
+        lv_obj_set_style(leftBox, &lv_style_btn_tgl_rel);                   
+        lv_obj_set_height(leftBox, 272);
+        lv_obj_set_width(leftBox, 240);
+        lv_obj_t * label;
+        
+        //write all of the tracking data to the left box
+        label = lv_label_create(leftBox, NULL);
+        lv_label_set_text(label, "Tracking Data");
+        lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_MID, 0, 15);
 
-    label = lv_label_create(obj2, NULL);
-    lv_label_set_text(label, " X       Y       R  ");
-    lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_MID, 0, 45);
+        label = lv_label_create(leftBox, NULL);
+        lv_label_set_text(label, " X       Y       R  ");
+        lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_MID, 0, 45);
 
-    label = lv_label_create(obj2, NULL);
-    std::string values =  writerPos.x + "     " + writerPos.y + "     "  + writerPos.a;
-    lv_label_set_text(label, values.c_str());
-    lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_MID, 0, 75);
+        label = lv_label_create(leftBox, NULL);
+        std::string values =  writerPos.x + "     " + writerPos.y + "     "  + writerPos.a;
+        lv_label_set_text(label, values.c_str());
+        lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_MID, 0, 75);
 
+        //using a slider as a seperator, kinda jank
+        lv_obj_t * slider = lv_slider_create(leftBox, NULL);      
+        lv_obj_set_size(slider, 300, 20);   
+        lv_obj_align(slider, NULL, LV_ALIGN_IN_TOP_MID, 0, 120); 
+        lv_slider_set_knob_in(slider, false);               
+        lv_slider_set_value(slider, 100);  
 
-    lv_obj_t * slider = lv_slider_create(obj2, NULL);      
-    lv_obj_set_size(slider, 300, 20);   
-    lv_obj_align(slider, NULL, LV_ALIGN_IN_TOP_MID, 0, 120); 
-    lv_slider_set_knob_in(slider, false);               
-    lv_slider_set_value(slider, 100);  
+        //vaquita image :).
+        extern const lv_img_dsc_t vaqr;
+        lv_obj_t * img = lv_img_create(leftBox, NULL);
+        lv_img_set_src(img, &vaqr);
+        lv_obj_set_pos(img, 0, 0);
+        lv_obj_set_drag(img, true);
+        lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, 0, 145);
+        
+        //create the right box and the label for reuse
+        lv_obj_t * rightBox;
+        rightBox = lv_obj_create(lv_scr_act(), NULL);
+        lv_obj_align(rightBox, leftBox, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);    
+        lv_obj_set_style(rightBox, &lv_style_btn_tgl_rel);                  
+        lv_obj_set_height(rightBox, 272);
+        lv_obj_set_width(rightBox, 240);
+        lv_obj_t * label2;
 
-      extern const lv_img_dsc_t vaqr;
-	lv_obj_t * img = lv_img_create(obj2, NULL);
-	lv_img_set_src(img, &vaqr);
-	lv_obj_set_pos(img, 0, 0);
-	lv_obj_set_drag(img, true);
-    lv_obj_align(img, NULL, LV_ALIGN_IN_TOP_MID, 0, 145);
+        //print the battery percentage to the brain
+        label2 = lv_label_create(rightBox, NULL);
+        lv_label_set_text(label2, std::string("Battery Percentage: " + std::to_string((int)pros::battery::get_capacity()) + "%").c_str());
+        lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, 0, 10);
 
+        //drivetrain image :).
+        extern const lv_img_dsc_t render;
+        lv_obj_t * im = lv_img_create(rightBox, NULL);
+        lv_img_set_src(im, &render);
+        lv_obj_set_pos(im, 0, 0);
+        lv_obj_set_drag(im, true);
+        lv_obj_align(im, NULL, LV_ALIGN_IN_TOP_MID, 0, 35);
 
-    
+        //left front drive status box
+        if(leftFront.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t sm;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &sm);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -55, 25);
+        }
+        else
+        {
+            extern const lv_img_dsc_t png;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &png);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -55, 25);
+        }
+        //right front drive status box
+        if(rightFront.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t sm;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &sm);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 55, 25);
+        }
+        else
+        {
+            extern const lv_img_dsc_t png;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &png);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 55, 25);
+        }
+        //right back drive status box
+        if(rightBack.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t sm;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &sm);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 55, 120);
+        }
+        else
+        {
+            extern const lv_img_dsc_t png;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &png);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 55, 120);
+        }
+        //left back drive status box
+        if(leftBack.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t sm;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &sm);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -55, 120);
+        }
+        else
+        {
+            extern const lv_img_dsc_t png;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &png);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -55, 120);
+        }
+        //claw status box
+        if(claw.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t smrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &smrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -5, 200);
+        }
+        else
+        {
+            extern const lv_img_dsc_t pngrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &pngrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -5, 200);
+        }
+        //claw lift status box
+        if(clawLift.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t smrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &smrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -5, 225);
+        }
+        else
+        {
+            extern const lv_img_dsc_t pngrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &pngrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, -5, 225);
+        }
+        //intake status box
+        if(intake.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t smrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &smrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 105, 200);
+        }
+        else
+        {
+            extern const lv_img_dsc_t pngrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &pngrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 105, 200);
+        }
+        //front goal lift status box
+        if(frontGoalLift.get_temperature() >= 55)
+        {
+            extern const lv_img_dsc_t smrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &smrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 105, 225);
+        }
+        else
+        {
+            extern const lv_img_dsc_t pngrev;
+            lv_obj_t * imger = lv_img_create(rightBox, NULL);
+            lv_img_set_src(imger, &pngrev);
+            lv_obj_set_pos(imger, 0, 0);
+            lv_obj_set_drag(imger, true);
+            lv_obj_align(imger, NULL, LV_ALIGN_IN_TOP_MID, 105, 225);
+        }
+        //draw all of the motor text
+        label2 = lv_label_create(rightBox, NULL);
+        lv_label_set_text(label2, "     Claw:");
+        lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, -60, 195);
 
-    lv_obj_t * obj3;
-    obj3 = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_align(obj3, obj2, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);    
-    lv_obj_set_style(obj3, &lv_style_btn_tgl_rel);                  
-    lv_obj_set_height(obj3, 272);
-    lv_obj_set_width(obj3, 240);
-    lv_obj_t * label2;
+        label2 = lv_label_create(rightBox, NULL);
+        lv_label_set_text(label2, "Claw Lift:");
+        lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, -60, 220);
 
+        label2 = lv_label_create(rightBox, NULL);
+        lv_label_set_text(label2, "   Intake:");
+        lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, 50, 195);
 
+        label2 = lv_label_create(rightBox, NULL);
+        lv_label_set_text(label2, "Goal Lift:");
+        lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, 50, 220);
 
-     label2 = lv_label_create(obj3, NULL);
-    lv_label_set_text(label2, std::string("Battery Percentage: " + std::to_string((int)pros::battery::get_capacity()) + "%").c_str());
-    lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, 0, 15);
+        //delay to prevent the program from locking up
+        pros::delay(150);
+    }
+}
 
-    extern const lv_img_dsc_t ree;
-	lv_obj_t * im = lv_img_create(obj3, NULL);
-	lv_img_set_src(im, &ree);
-	lv_obj_set_pos(im, 0, 0);
-	lv_obj_set_drag(im, true);
-    lv_obj_align(im, NULL, LV_ALIGN_IN_TOP_MID, 0, 35);
+void initialize() 
+{
+	pros::Task trackingTask(trackPosition);
+    pros::Task macroTask(threadMacro);
+    pros::Task draw(drawUI);
+}
 
-    label2 = lv_label_create(obj3, NULL);
-    lv_label_set_text(label2, "     Claw:");
-    lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, -60, 195);
+void disabled() {}
 
-     label2 = lv_label_create(obj3, NULL);
-    lv_label_set_text(label2, "Claw Lift:");
-    lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, -60, 220);
+void competition_initialize() {}
 
-    label2 = lv_label_create(obj3, NULL);
-    lv_label_set_text(label2, "   Intake:");
-    lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, 50, 195);
+extern void runAuton();
 
-     label2 = lv_label_create(obj3, NULL);
-    lv_label_set_text(label2, "Goal Lift:");
-    lv_obj_align(label2, NULL, LV_ALIGN_IN_TOP_MID, 50, 220);
+void autonomous() 
+{
+    runAuton();
+}
 
-    
+void opcontrol() 
+{
+    frontGoalLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    claw.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    clawLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    intake.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+
+    runningAuton = false;
+
+    while(true)
+    {
         int Ch1 = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         int Ch3 = -controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int Ch4 = -controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
@@ -218,7 +345,7 @@ void opcontrol()
             intake.move(0);
         }
         */
-       intake.move(127);
+        intake.move(127);
         moveGoalLift();
         pros::delay(10);
     }
