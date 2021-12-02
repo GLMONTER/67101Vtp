@@ -95,7 +95,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_PNG uint8_t png_map[] = {
 
 };
 
-const lv_img_dsc_t png = {
+const lv_img_dsc_t bigGreenBox = {
   .header.always_zero = 0,
   .header.w = 51,
   .header.h = 80,

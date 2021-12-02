@@ -97,7 +97,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_VAQR uint8_t vaqr_map[] = {
 
 };
 
-const lv_img_dsc_t vaqr = {
+const lv_img_dsc_t vaquitaImage = {
   .header.always_zero = 0,
   .header.w = 144,
   .header.h = 82,

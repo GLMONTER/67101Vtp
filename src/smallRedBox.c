@@ -27,7 +27,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_SMREV uint8_t smrev_map[] = {
 
 };
 
-const lv_img_dsc_t smrev = {
+const lv_img_dsc_t smallRedBox = {
   .header.always_zero = 0,
   .header.w = 20,
   .header.h = 12,

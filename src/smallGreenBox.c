@@ -28,7 +28,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_PNGREV uint8_t pngrev_map[] = {
 
 };
 
-const lv_img_dsc_t pngrev = {
+const lv_img_dsc_t smallGreenBox = {
   .header.always_zero = 0,
   .header.w = 20,
   .header.h = 13,
