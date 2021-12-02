@@ -105,8 +105,6 @@ void moveGoalLift()
     if(overrideFlag && controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
         overrideFlag = false;
 
-    pros::lcd::print(7, "%f", claw.get_torque());
-
     //check to make sure the front goal lift stays above its range
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2) && frontGoalLift.get_position() < 0)
     {

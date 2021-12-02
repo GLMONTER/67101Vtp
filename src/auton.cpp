@@ -15,12 +15,12 @@ float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 360.0);
 
 typedef struct _pos
 {
-	float a;
-	float y;
-	float x;
-	int leftLst;
-	int rightLst;
-	int backLst;
+	float a = 0;
+	float y = 0;
+	float x = 0;
+	int leftLst = 0;
+	int rightLst = 0;
+	int backLst = 0;
 } sPos; // Position of the robot
 
 sPos gPosition;
@@ -92,15 +92,6 @@ void trackPosition()
 	gPosition.x += h2 * cosP; 
 
 	gPosition.a += a;
-  
-    pros::lcd::print(0, "x :  %f\n", gPosition.x);
-    pros::lcd::print(1, "y :  %f\n", gPosition.y);
-    
-    pros::lcd::print(2, "left :  %d\n", leftEncoder.get_position() / 100);
-    pros::lcd::print(3, "right :  %d\n", rightEncoder.get_position() / 100);
-    pros::lcd::print(4, "middle :  %d\n", middleEncoder.get_position() / 100);
-    
-    pros::lcd::print(2, "rotation :  %f\n", gPosition.a);
     
     
     pros::delay(5);
