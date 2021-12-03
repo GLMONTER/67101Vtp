@@ -208,6 +208,24 @@ void drawUI()
     intakeRedBox = lv_img_create(rightBox, NULL);
     lv_img_set_src(intakeRedBox, &smallRedBox);
 
+    //so they dont draw before they are needed
+    lv_obj_set_hidden(intakeRedBox, true);
+    lv_obj_set_hidden(intakeGreenBox, true);
+    lv_obj_set_hidden(goalLiftGreenBox, true);
+    lv_obj_set_hidden(goalLiftRedBox, true);
+    lv_obj_set_hidden(clawGreenBox, true);
+    lv_obj_set_hidden(clawRedBox, true);
+    lv_obj_set_hidden(clawLiftGreenBox, true);
+    lv_obj_set_hidden(clawLiftRedBox, true);
+    lv_obj_set_hidden(leftBackGreenBox, true);
+    lv_obj_set_hidden(leftBackRedBox, true);
+    lv_obj_set_hidden(leftFrontGreenBox, true);
+    lv_obj_set_hidden(leftFrontRedBox, true);
+    lv_obj_set_hidden(rightBackRedBox, true);
+    lv_obj_set_hidden(rightBackGreenBox, true);
+    lv_obj_set_hidden(rightFrontGreenBox, true);
+    lv_obj_set_hidden(rightFrontRedBox, true);
+
     while(true)
     {
         /* This string stream code fills a struct with the tracking data and then truncates it to two decimal places*/
@@ -249,7 +267,7 @@ void drawUI()
             lv_obj_set_hidden(leftFrontRedBox, false);
             lv_obj_align(leftFrontRedBox, NULL, LV_ALIGN_IN_TOP_MID, -55, 25);
         }
-        if(leftFront.get_temperature() <= 55)
+        else if(leftFront.get_temperature() < 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(leftFrontGreenBox, false);
@@ -262,7 +280,7 @@ void drawUI()
             lv_obj_set_hidden(rightFrontRedBox, false);
             lv_obj_align(rightFrontRedBox, NULL, LV_ALIGN_IN_TOP_MID, 55, 25);
         }
-        if(rightFront.get_temperature() <= 55)
+        else if(rightFront.get_temperature() < 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(rightFrontGreenBox, false);
@@ -275,7 +293,7 @@ void drawUI()
             lv_obj_set_hidden(rightBackRedBox, false);
             lv_obj_align(rightBackRedBox, NULL, LV_ALIGN_IN_TOP_MID, 55, 120);
         }
-        if(rightBack.get_temperature() <= 55)
+        else if(rightBack.get_temperature() < 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(rightBackGreenBox, false);
@@ -288,7 +306,7 @@ void drawUI()
             lv_obj_set_hidden(leftBackRedBox, false);
             lv_obj_align(leftBackRedBox, NULL, LV_ALIGN_IN_TOP_MID, -55, 120);
         }
-        if(leftBack.get_temperature() <= 55)
+        else if(leftBack.get_temperature() < 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(leftBackGreenBox, false);
@@ -301,7 +319,7 @@ void drawUI()
             lv_obj_set_hidden(clawRedBox, false);
             lv_obj_align(clawRedBox, NULL, LV_ALIGN_IN_TOP_MID, -5, 200);
         }
-        else
+        else if(claw.get_temperature() <=55)
         {
             lv_obj_set_hidden(clawRedBox, true);
             lv_obj_set_hidden(clawGreenBox, false);
@@ -314,7 +332,7 @@ void drawUI()
             lv_obj_set_hidden(clawLiftRedBox, false);
             lv_obj_align(clawLiftRedBox, NULL, LV_ALIGN_IN_TOP_MID, -5, 225);
         }
-        if(clawLift.get_temperature() <= 55)
+        else if(clawLift.get_temperature() < 55)
         {
             lv_obj_set_hidden(clawRedBox, true);
             lv_obj_set_hidden(clawGreenBox, false);
@@ -327,7 +345,7 @@ void drawUI()
             lv_obj_set_hidden(intakeRedBox, false);
             lv_obj_align(intakeRedBox, NULL, LV_ALIGN_IN_TOP_MID, 105, 200);
         }
-        if(intake.get_temperature() <= 55)
+        else if(intake.get_temperature() < 55)
         {
             lv_obj_set_hidden(intakeRedBox, true);
             lv_obj_set_hidden(intakeGreenBox, false);
@@ -340,7 +358,7 @@ void drawUI()
             lv_obj_set_hidden(goalLiftRedBox, false);
             lv_obj_align(goalLiftRedBox, NULL, LV_ALIGN_IN_TOP_MID, 105, 225);
         }
-        if(frontGoalLift.get_temperature() <= 55)
+        else if(frontGoalLift.get_temperature() < 55)
         {
             lv_obj_set_hidden(goalLiftRedBox, true);
             lv_obj_set_hidden(goalLiftGreenBox, false);
