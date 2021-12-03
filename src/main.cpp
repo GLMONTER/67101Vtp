@@ -78,7 +78,7 @@ void drawUI()
     lv_obj_align(trackingDataLabel, NULL, LV_ALIGN_IN_TOP_MID, 0, 10);
 
     XYRLabel = lv_label_create(leftBox, NULL);
-    lv_label_set_text(XYRLabel, " X       Y       R  ");
+    lv_label_set_text(XYRLabel, " X        Y        R  ");
     lv_obj_align(XYRLabel, NULL, LV_ALIGN_IN_TOP_MID, 0, 45);
 
     //write all of the tracking data to the left box
@@ -234,7 +234,7 @@ void drawUI()
         //clear the string stream
         streamOBJ.str("");
        
-        std::string values =  writerPos.x + "     " + writerPos.y + "     "  + writerPos.a;
+        std::string values =  writerPos.x + " in" + "  " + writerPos.y + " in" + "  "  + writerPos.a + " rad";
         lv_label_set_text(trackingInfoLabel, values.c_str());
         lv_obj_align(trackingInfoLabel, NULL, LV_ALIGN_IN_TOP_MID, 0, 75);
 
@@ -249,7 +249,7 @@ void drawUI()
             lv_obj_set_hidden(leftFrontRedBox, false);
             lv_obj_align(leftFrontRedBox, NULL, LV_ALIGN_IN_TOP_MID, -55, 25);
         }
-        else
+        if(leftFront.get_temperature() <= 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(leftFrontGreenBox, false);
@@ -262,7 +262,7 @@ void drawUI()
             lv_obj_set_hidden(rightFrontRedBox, false);
             lv_obj_align(rightFrontRedBox, NULL, LV_ALIGN_IN_TOP_MID, 55, 25);
         }
-        else
+        if(rightFront.get_temperature() <= 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(rightFrontGreenBox, false);
@@ -275,7 +275,7 @@ void drawUI()
             lv_obj_set_hidden(rightBackRedBox, false);
             lv_obj_align(rightBackRedBox, NULL, LV_ALIGN_IN_TOP_MID, 55, 120);
         }
-        else
+        if(rightBack.get_temperature() <= 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(rightBackGreenBox, false);
@@ -288,7 +288,7 @@ void drawUI()
             lv_obj_set_hidden(leftBackRedBox, false);
             lv_obj_align(leftBackRedBox, NULL, LV_ALIGN_IN_TOP_MID, -55, 120);
         }
-        else
+        if(leftBack.get_temperature() <= 55)
         {
             lv_obj_set_hidden(leftFrontRedBox, true);
             lv_obj_set_hidden(leftBackGreenBox, false);
@@ -314,7 +314,7 @@ void drawUI()
             lv_obj_set_hidden(clawLiftRedBox, false);
             lv_obj_align(clawLiftRedBox, NULL, LV_ALIGN_IN_TOP_MID, -5, 225);
         }
-        else
+        if(clawLift.get_temperature() <= 55)
         {
             lv_obj_set_hidden(clawRedBox, true);
             lv_obj_set_hidden(clawGreenBox, false);
@@ -327,7 +327,7 @@ void drawUI()
             lv_obj_set_hidden(intakeRedBox, false);
             lv_obj_align(intakeRedBox, NULL, LV_ALIGN_IN_TOP_MID, 105, 200);
         }
-        else
+        if(intake.get_temperature() <= 55)
         {
             lv_obj_set_hidden(intakeRedBox, true);
             lv_obj_set_hidden(intakeGreenBox, false);
@@ -340,7 +340,7 @@ void drawUI()
             lv_obj_set_hidden(goalLiftRedBox, false);
             lv_obj_align(goalLiftRedBox, NULL, LV_ALIGN_IN_TOP_MID, 105, 225);
         }
-        else
+        if(frontGoalLift.get_temperature() <= 55)
         {
             lv_obj_set_hidden(goalLiftRedBox, true);
             lv_obj_set_hidden(goalLiftGreenBox, false);
