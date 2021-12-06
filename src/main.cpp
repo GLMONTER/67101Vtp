@@ -2,6 +2,8 @@
 //for std::setpercision
 #include <iomanip>
 
+#define TESTING 
+
 extern void trackPosition();
 extern void threadMacro();
 
@@ -33,7 +35,7 @@ struct outputPos
     std::string x, y, a;
 };
 outputPos writerPos;
-
+#ifndef TESTING
 //task to draw the ui on screen
 void drawUI()
 {
@@ -369,12 +371,16 @@ void drawUI()
         pros::delay(50);
     }
 }
-
+#endif
 void initialize() 
 {
 	pros::Task trackingTask(trackPosition);
     pros::Task macroTask(threadMacro);
+    #ifndef TESTING
     pros::Task draw(drawUI);
+    #else
+    pros::lcd::initialize();
+    #endif
 }
 
 void disabled() {}
