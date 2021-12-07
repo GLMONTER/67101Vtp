@@ -11,7 +11,7 @@ pros::Motor intake(1, pros::E_MOTOR_GEARSET_18, false);
 
 pros::Motor frontGoalLift(13, pros::E_MOTOR_GEARSET_36, false);
 
-pros::Motor claw(3, pros::E_MOTOR_GEARSET_36, false);
+pros::Motor claw(3, pros::E_MOTOR_GEARSET_36, true);
 pros::Motor clawLift(2, pros::E_MOTOR_GEARSET_36, false);
 
 pros::ADIDigitalIn buttonLimit('H');
@@ -119,20 +119,31 @@ void moveGoalLift()
     {
         frontGoalLift.move_velocity(0);
     }
-    
+    static bool clampFlag = false;
+    if(clampFlag)
+    {
+        if(claw.get_torque() < 2)
+        {
+            claw.move(-127);
+        }
+        
+    }
+    pros::lcd::print(5, "%f", claw.get_position());
     //move the claw
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
-        claw.move_absolute(-500, 200);
+        clampFlag = true;
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {
-        claw.move_absolute(1300, 200);
+        clampFlag = false;
+        claw.move_absolute(0, 200);
     }
-    else if((claw.get_position() > 1200 && claw.get_position() < 1400) || (claw.get_position() > -200 && claw.get_position() < -50))
+    else if((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag)
     {
         claw.move_velocity(0);
     }
+    
     //if override is enabled, manually control claw lift
     if(overrideFlag)
     {

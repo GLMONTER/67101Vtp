@@ -113,9 +113,9 @@ float getNewPID(const float error, bool resetFlag)
         previousError = 0;
     }
     #if Win
-    const float Ki = 0.125;
+    const float Ki = 0.225;
     const float Kd = 0.1f;
-    const float Kp = 1.5f;
+    const float Kp = 1.6f;
     #else
     const float Ki = 0.3;
     const float Kd = 0.1f;
@@ -361,10 +361,10 @@ void skills()
     frontGoalLift.move_absolute(-3700, 200);
     pros::delay(1500);
     moveToPoint(0, -4.8, 0, true, 80, 4000);
-    moveToPoint(-18.5, 5, 1.57, true, 65, 4000);
+    moveToPoint(-18.5, 5, 1.57, true, 80, 4000);
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
-    moveToPoint(-42, 5, 1.57, false, 50, 4000);
+    moveToPoint(-42, 5, 1.57, false, 70, 4000);
     claw.move_absolute(-100, 200);
     pros::delay(700);
     clawLift.move_absolute(-4000, 200);
@@ -381,13 +381,13 @@ void skills()
 
     moveToPoint(-36, 34, 3.14, true, 127, 5000);
     //moveToPoint(-56, 31, 3.14, true, 127, 5000);
-    moveToPoint(-68, 33, 3.14, true, 127, 4000);
+    moveToPoint(-68, 33, 3.14, true, 127, 3000);
 
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
     //go get last neutral
-    moveToPoint(-48.25, 53, 3.14, true, 80, 5000);
-    moveToPoint(-48.25, 59, 3.14, false, 70, 5000);
+    moveToPoint(-49.25, 53, 3.14, true, 80, 5000);
+    moveToPoint(-49.25, 59, 3.14, false, 70, 5000);
 
     claw.move_absolute(-100, 200);
     pros::delay(700);
@@ -402,26 +402,26 @@ void skills()
     pros::delay(1000);
 
     //push rings out of way
-    moveToPoint(-20, 65, 3.14, true, 70, 5000);
+    moveToPoint(-21, 65, 3.14, true, 70, 5000);
     moveToPoint(-28, 70, 2.5, true, 70, 5000);
-    moveToPoint(-20, 65, 3.14, true, 70, 5000);
+    moveToPoint(-21, 65, 3.14, true, 70, 5000);
 
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(1300, 200);
 
     //move towards blue alliance
-    moveToPoint(-20, 77.7, 3.14, false, 65, 4000);
+    moveToPoint(-21, 77.7, 3.14, false, 65, 4000);
     //clamp
     claw.move_absolute(-100, 200);
 
     pros::delay(700);
-    moveToPoint(-20, 73, 3.14, false, 65, 4000);
+    moveToPoint(-21, 73, 3.14, false, 65, 4000);
     clawLift.move_absolute(-4000, 200);
 
     pros::delay(1500);
     moveToPoint(-24, 73, 4.57, false, 65, 5000);
     moveToPoint(-84.3, 50, 1.57, false, 110, 5000);
-    moveToPoint(-87.75, 34, 1.57, true, 110, 5000);
+    moveToPoint(-87.75, 27, 1.57, true, 110, 5000);
     clawLift.move_absolute(-3000, 200);
     pros::delay(500);
     claw.move_absolute(1300, 200);
