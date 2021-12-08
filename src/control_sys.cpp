@@ -20,6 +20,8 @@ bool overrideFlag = false;
 //to check if we are running the auton, for use in the multithreaded task
 extern bool runningAuton;
 
+bool clawOpened = true;
+
 void threadMacro()
 {
     int state = 0;
@@ -32,6 +34,26 @@ void threadMacro()
     
     while(true)
     {
+        if(runningAuton)
+        {
+            //begin normal claw code
+            if(clawOpened)
+            {
+                claw.move_absolute(0, 200);
+            }
+            if(!clawOpened)
+            {
+                if(claw.get_torque() < 2)
+                {
+                    claw.move(-127);
+                }
+            }
+            if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpened) || (!clawOpened && claw.get_torque() > 2))
+            {
+                claw.move_velocity(0);
+            }
+        }
+        //begin lift code
         if(overrideFlag || runningAuton)
         {
             pros::delay(10);
@@ -83,16 +105,20 @@ void threadMacro()
         }
         else if(state == 1)
         {
-            clawLift.move_absolute(-1200, 200);
+            clawLift.move_absolute(-1350, 200);
         }
         else if(state == 2)
         {
-            clawLift.move_absolute(-3200, 200);
+            clawLift.move_absolute(-3400, 200);
         }
         else if(state == 3)
         {
-            clawLift.move_absolute(-4000, 200);
+            clawLift.move_absolute(-4300, 200);
         }
+        //end lift code
+        
+
+
         pros::delay(10);
     }
 }
@@ -119,27 +145,43 @@ void moveGoalLift()
     {
         frontGoalLift.move_velocity(0);
     }
+    //check if we are tring to clamp on a goal
     static bool clampFlag = false;
+    //check if the a button is pressed
+    static bool aFlag = false;
+    //check to see if the claw is trying to let go
+    static bool letGoFlag = false;
+    
     if(clampFlag)
     {
         if(claw.get_torque() < 2)
         {
             claw.move(-127);
         }
-        
     }
-    pros::lcd::print(5, "%f", claw.get_position());
+    pros::lcd::print(5, "%f", clawLift.get_position());
     //move the claw
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
         clampFlag = true;
+        aFlag = false;
+        letGoFlag = false;
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {
         clampFlag = false;
+        aFlag = false;
+        letGoFlag = true;
         claw.move_absolute(0, 200);
     }
-    else if((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag)
+    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
+    {
+        clampFlag = false;
+        aFlag = true;
+        letGoFlag = true;
+        claw.move(50);
+    }
+    else if(((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag && !letGoFlag) || (clampFlag && claw.get_torque() > 2) || aFlag)
     {
         claw.move_velocity(0);
     }

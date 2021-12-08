@@ -413,7 +413,7 @@ void opcontrol()
         leftBack.move(Ch3 + Ch1 - Ch4);
         rightFront.move(Ch3 - Ch1 - Ch4);
         rightBack.move(Ch3 - Ch1 + Ch4);
-        
+        /*
         if(flag)
         {
         if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
@@ -423,7 +423,7 @@ void opcontrol()
         else
             intake.move(0);
         }
-        
+        */
        // intake.move(127);
         moveGoalLift();
         pros::delay(10);
