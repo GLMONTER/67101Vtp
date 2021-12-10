@@ -5,6 +5,7 @@
 void moveGoalLift();
 
 extern pros::Controller controller;
+extern pros::Controller slaveController;
 
 extern pros::Motor rightBack;
 extern pros::Motor leftBack;

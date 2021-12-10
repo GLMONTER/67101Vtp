@@ -11,8 +11,6 @@ extern pros::Rotation leftEncoder;
 extern pros::Rotation middleEncoder;
 extern pros::Rotation rightEncoder;
 
-int flag = true;
-
 typedef struct _pos
 {
 	float a = 0;
@@ -413,18 +411,15 @@ void opcontrol()
         leftBack.move(Ch3 + Ch1 - Ch4);
         rightFront.move(Ch3 - Ch1 - Ch4);
         rightBack.move(Ch3 - Ch1 + Ch4);
-        /*
-        if(flag)
-        {
-        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))
-            intake.move_velocity(175);
-        else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
-            intake.move_velocity(-175);
+        
+        //slave controller code to control intake
+        if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+            intake.move(127);
+        else if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+            intake.move(-127);
         else
             intake.move(0);
-        }
-        */
-       // intake.move(127);
+        
         moveGoalLift();
         pros::delay(10);
     }

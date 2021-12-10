@@ -1,6 +1,7 @@
 #include"control_sys.hpp"
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
+pros::Controller slaveController(pros::E_CONTROLLER_PARTNER);
 
 pros::Motor rightBack(19, pros::E_MOTOR_GEARSET_18, true);
 pros::Motor leftBack(8, pros::E_MOTOR_GEARSET_18, false);
@@ -21,9 +22,12 @@ bool overrideFlag = false;
 extern bool runningAuton;
 
 bool clawOpened = true;
+bool liftUp = false;
+bool runningSkills = true;
 
 void threadMacro()
 {
+
     int state = 0;
 
     int upPressed = 0;
@@ -32,10 +36,31 @@ void threadMacro()
     int downPressed = 0;
     int downToggle = 0;
     
+    int flagLock = false;
     while(true)
     {
         if(runningAuton)
         {
+            if(runningSkills)
+            {
+                if(!buttonLimit.get_value() && liftUp)
+                {
+                    if(flagLock)
+                        frontGoalLift.move_velocity(0);
+
+                    frontGoalLift.move(-127);
+                }
+                if(!liftUp)
+                {
+                    flagLock = false;
+                    frontGoalLift.move_absolute(0, 200);
+                }
+                if(buttonLimit.get_value() && liftUp)
+                {
+                    
+                    flagLock = true;
+                }
+            }
             //begin normal claw code
             if(clawOpened)
             {

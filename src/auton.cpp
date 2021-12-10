@@ -2,17 +2,38 @@
 
 bool runningAuton = false;
 extern bool clawOpened;
+extern bool liftUp;
 #define Win true
 //tracking wheel diameter in inches
 #define WHEEL_DIAM 2.783
 //calculate how far the wheel will travel in one rotation
-float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 360.0);
+float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 36000);
 //distance from the left tracking wheel to tracking center
 #define L_DISTANCE_IN 4.025
 //distance from the right tracking wheel to tracking center
 #define R_DISTANCE_IN 4.025
 //distance from the rear tracking wheel to tracking center
 #define S_DISTANCE_IN 2.25
+extern pros::ADIDigitalIn buttonLimit;
+
+pros::Rotation leftEncoder(17);
+pros::Rotation rightEncoder(4);
+pros::Rotation middleEncoder(18);
+
+auto chassis = ChassisControllerBuilder()
+    .withMotors(leftFront.get_port(), rightFront.get_port()) // left motor is 1, right motor is 2 (reversed)
+    // green gearset, 4 inch wheel diameter, 11.5 inch wheel track
+    .withDimensions(AbstractMotor::gearset::green, {{4_in, 10_in}, imev5GreenTPR})
+    .withSensors(
+        RotationSensor(17),
+        RotationSensor(4),
+        RotationSensor(18)
+    )
+    // specify the tracking wheels diameter (2.75 in), track (7 in), and TPR (360)
+    // specify the middle encoder distance (1 in) and diameter (2.75 in)
+    .withOdometry({{2.783_in, 8.25_in, 2.1_in, 2.783_in}, quadEncoderTPR})
+    .buildOdometry();
+
 
 typedef struct _pos
 {
@@ -27,9 +48,7 @@ typedef struct _pos
 sPos gPosition;
 
 
-pros::Rotation leftEncoder(17);
-pros::Rotation rightEncoder(4);
-pros::Rotation middleEncoder(18);
+
 
 void trackPosition()
 {    
@@ -46,10 +65,17 @@ void trackPosition()
 
     while(true)
     {
+        {
+            pros::lcd::print(0, "X : %f", chassis->getState().x * 39.37);
+            pros::lcd::print(1, "Y : %f", chassis->getState().y* 39.37);
+            pros::lcd::print(2, "R : %f", chassis->getState().theta);
+            pros::delay(10);
+            continue;
+        }
     //get encoder position based on a 360 tick rotation
-    float left = leftEncoder.get_position() / 100;
-    float right = rightEncoder.get_position() / 100;
-    float back = middleEncoder.get_position() / 100;
+    float left = leftEncoder.get_position();
+    float right = rightEncoder.get_position();
+    float back = middleEncoder.get_position();
 
     float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
 	float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
@@ -93,11 +119,11 @@ void trackPosition()
 	gPosition.x += h2 * cosP; 
 
 	gPosition.a += a;
-    
+    /*
     pros::lcd::print(0, "X : %f", gPosition.x);
     pros::lcd::print(1, "Y : %f", gPosition.y);
     pros::lcd::print(2, "R : %f", gPosition.a);
-
+*/
     pros::delay(5);
     }
 }
@@ -115,9 +141,9 @@ float getNewPID(const float error, bool resetFlag)
         previousError = 0;
     }
     #if Win
-   const float Ki = 0.15;
-    const float Kd = 0.1f;
-    const float Kp = 1.55f;
+   const float Ki = 0.1;
+    const float Kd = 0.11f;
+    const float Kp = 1.5f;
     #else
     const float Ki = 0.3;
     const float Kd = 0.1f;
@@ -363,36 +389,46 @@ void eightSkills()
 }
 void skills()
 {
-    frontGoalLift.move_absolute(-3700, 200);
-    pros::delay(1500);
+    //lift up counter weight
+    liftUp = true;
+    while(!buttonLimit.get_value())
+    {
+        pros::delay(5);
+    }
+    //drive away from platform
     moveToPoint(0, -4.8, 0, true, 90, 4000);
+    //turn towards first goal
+     clawLift.move_absolute(-1200, 200);
     moveToPoint(-18.5, 5, 1.57, true, 90, 4000);
-    clawLift.move_absolute(-1200, 200);
-    clawOpened = true;
-    moveToPoint(-42, 5, 1.57, false, 90, 4000);
+   
+    moveToPoint(-39, 5, 1.57, false, 90, 4000);
     clawOpened = false;
     pros::delay(700);
     clawLift.move_absolute(-4300, 200);
     pros::delay(1500);
-    moveToPoint(-27, 3.6, 1.57, true, 80, 4000);
+    moveToPoint(-27, 3.6, 1.57, true, 90, 4000);
     moveToPoint(-28, 35, 1.57, true, 100, 4000);
-    moveToPoint(-30, 35, 4.57, true, 80, 4000);
-    moveToPoint(-19, 35, 4.57, true, 80, 2500);
+    moveToPoint(-30, 35, 4.57, true, 90, 4000);
+    moveToPoint(-19, 35, 4.57, true, 90, 2500);
 
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(1000);
-
-    moveToPoint(-36, 34, 3.14, true, 127, 5000);
+    pros::delay(1500);
+    clawLift.move_absolute(-4500, 200);
+    
+    moveToPoint(-25, 35, 4.57, true, 90, 2500);
+    
+    moveToPoint(-36, 34, 1.57, true, 127, 5000);
+    clawLift.move_absolute(-1200, 200);
     //moveToPoint(-56, 31, 3.14, true, 127, 5000);
-    moveToPoint(-68, 33, 3.14, true, 127, 3000);
+    moveToPoint(-68, 33, 1.57, true, 127, 5000);
 
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
     //go get last neutral
-    moveToPoint(-49.25, 53, 3.14, true, 80, 5000);
-    moveToPoint(-49.25, 59, 3.14, false, 70, 5000);
+    moveToPoint(-49, 53, 3.14, true, 100, 5000);
+    moveToPoint(-49, 59, 3.14, false, 80, 5000);
 
     clawOpened = false;
     pros::delay(700);
@@ -418,34 +454,35 @@ void skills()
     clawOpened = false;
 
     pros::delay(700);
-    moveToPoint(-21, 73, 3.14, false, 80, 4000);
+    moveToPoint(-21, 73, 3.14, false, 90, 4000);
     clawLift.move_absolute(-4300, 200);
-
     pros::delay(1250);
-    //moveToPoint(-24, 73, 4.57, false, 65, 5000);
-    moveToPoint(-84.3, 50, 1.57, false, 100, 5000);
-    moveToPoint(-87.75, 34, 1.57, true, 100, 5000);
+    moveToPoint(-82, 50, 1.57, false, 100, 5000);
+    moveToPoint(-85.75, 33, 1.57, true, 100, 5000);
     clawLift.move_absolute(-3000, 200);
     pros::delay(500);
     clawOpened = true;
     clawLift.move_absolute(-4300, 200);
     pros::delay(1000);
-    frontGoalLift.move_absolute(0, 200);
+    liftUp = false;
     pros::delay(1000);
-    moveToPoint(-76, 34, 1.57, true, 100, 5000);
+    moveToPoint(-74, 34, 1.57, true, 100, 5000);
     clawLift.move_absolute(-1200, 200);
-    moveToPoint(-82, 34, 1.57, true, 100, 5000);
-    moveToPoint(-82, 37, 4.71, true, 100, 5000);
+    moveToPoint(-80, 34, 1.57, true, 100, 5000);
+    moveToPoint(-80, 34, 4.71, true, 100, 5000);
+    moveToPoint(-75, 34, 4.71, true, 100, 5000);
+    //grab rear goal
     clawOpened = false;
+    pros::delay(500);
     clawLift.move_absolute(-4300, 200);
     pros::delay(1000);
-    moveToPoint(-87.75, 37, 1.57, true, 100, 5000);
+    moveToPoint(-85.75, 34, 1.57, true, 100, 5000);
     clawLift.move_absolute(-3000, 200);
     pros::delay(500);
-    clawOpened = false;
-    clawLift.move_absolute(-4300, 200);
+    clawOpened = true;
     pros::delay(500);
-    moveToPoint(-80, 32, 1.57, true, 100, 5000);
+    clawLift.move_absolute(-4300, 200);
+    moveToPoint(-78, 34, 1.57, true, 100, 5000);
     pros::delay(5000);
     
 }
@@ -480,6 +517,6 @@ void runAuton()
     runningAuton = true;
     init();
     skills();
-    
+    //moveToPoint(-12, 12, 1.57, false, 100, 5000);
     runningAuton = false;
 }
