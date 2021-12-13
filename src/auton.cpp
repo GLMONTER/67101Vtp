@@ -1,4 +1,4 @@
-#include"main.h"
+#include"../include/main.h"
 
 bool runningAuton = false;
 extern bool clawOpened;
@@ -19,6 +19,7 @@ extern pros::ADIDigitalIn buttonLimit;
 pros::Rotation leftEncoder(17);
 pros::Rotation rightEncoder(4);
 pros::Rotation middleEncoder(18);
+
 
 auto chassis = ChassisControllerBuilder()
     .withMotors(leftFront.get_port(), rightFront.get_port()) // left motor is 1, right motor is 2 (reversed)
@@ -65,6 +66,7 @@ void trackPosition()
 
     while(true)
     {
+    /*
         {
             pros::lcd::print(0, "X : %f", chassis->getState().x * 39.37);
             pros::lcd::print(1, "Y : %f", chassis->getState().y* 39.37);
@@ -72,6 +74,7 @@ void trackPosition()
             pros::delay(10);
             continue;
         }
+        */
     //get encoder position based on a 360 tick rotation
     float left = leftEncoder.get_position();
     float right = rightEncoder.get_position();
@@ -119,11 +122,11 @@ void trackPosition()
 	gPosition.x += h2 * cosP; 
 
 	gPosition.a += a;
-    /*
+
     pros::lcd::print(0, "X : %f", gPosition.x);
     pros::lcd::print(1, "Y : %f", gPosition.y);
     pros::lcd::print(2, "R : %f", gPosition.a);
-*/
+
     pros::delay(5);
     }
 }
@@ -269,23 +272,6 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 }
 void winPointold()
 {
-     frontGoalLift.move_absolute(-3700, 200);
-    pros::delay(1500);
-    intake.move(127);
-    moveToPoint(0, -6.8, 0, true, 80, 3000);
-    intake.move(0);
-  //  moveToPoint(-24, -6.8, 0, true, 100, 3000);
-    moveToPoint(-20, -6.8, 3.14, true, 80, 3000);
-    clawLift.move_absolute(-1200, 200);
-    moveToPoint(-20, 72, 3.14, true, 90, 5000);
-    clawOpened = true;
-    pros::delay(500);
-    moveToPoint(-38, 72, 3.14, true, 80, 3000);
-    moveToPoint(-38, 80, 3.14, true, 80, 3000);
-    moveToPoint(-14, 80, 3.14, true, 80, 3000);
-}
-void winPoint()
-{
     frontGoalLift.move_absolute(-3800, 200);
     pros::delay(800);
     intake.move(127);
@@ -305,6 +291,22 @@ void winPoint()
     //moveToPoint(-40, 66, 0.82, true, 100, 3000);
     moveToPoint(-8, 87, 1, true, 127, 3000);
     frontGoalLift.move_absolute(-3000, 200);
+}
+void winPoint()
+{
+intake.move(-127);
+pros::delay(500);
+intake.move(0);
+moveToPoint(-20, 0, 0, true, 80, 2000);
+moveToPoint(-22.25, 77, 0, true, 70, 6000);
+intake.move(127);
+pros::delay(2000);
+intake.move(0);
+moveToPoint(-22.25, 74, 0, true, 80, 2000);
+moveToPoint(-38, 77.25, 0, true, 80, 2000);
+moveToPoint(-37, 87, 0, true, 80, 2000);
+moveToPoint(-10, 87.75, 0, true, 80, 2000);
+
 }
 void rightQuali()
 {
@@ -356,9 +358,6 @@ void leftQuali()
     pros::delay(700);
     clawLift.move_absolute(-1800, 200);
     moveToPoint(-8, 42, 3.14, true, 127, 2000);
-    
-    
-   
 }
 void eightSkills()
 {
@@ -516,7 +515,8 @@ void runAuton()
 {
     runningAuton = true;
     init();
-    skills();
+
+    winPoint();
     //moveToPoint(-12, 12, 1.57, false, 100, 5000);
     runningAuton = false;
 }

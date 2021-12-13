@@ -1,4 +1,4 @@
-#include "main.h"
+#include "../include/main.h"
 //for std::setpercision
 #include <iomanip>
 

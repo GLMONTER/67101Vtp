@@ -1,4 +1,4 @@
-#include"control_sys.hpp"
+#include"../include/control_sys.hpp"
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 pros::Controller slaveController(pros::E_CONTROLLER_PARTNER);
@@ -14,6 +14,7 @@ pros::Motor frontGoalLift(13, pros::E_MOTOR_GEARSET_36, false);
 
 pros::Motor claw(3, pros::E_MOTOR_GEARSET_36, true);
 pros::Motor clawLift(2, pros::E_MOTOR_GEARSET_36, false);
+
 
 pros::ADIDigitalIn buttonLimit('H');
 //allow macro systems to be overrided
@@ -68,12 +69,12 @@ void threadMacro()
             }
             if(!clawOpened)
             {
-                if(claw.get_torque() < 2)
+                if(claw.get_torque() < 1.5)
                 {
                     claw.move(-127);
                 }
             }
-            if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpened) || (!clawOpened && claw.get_torque() > 2))
+            if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpened) || (!clawOpened && claw.get_torque() > 1.5))
             {
                 claw.move_velocity(0);
             }
@@ -179,12 +180,12 @@ void moveGoalLift()
     
     if(clampFlag)
     {
-        if(claw.get_torque() < 2)
+        if(claw.get_torque() < 1.5)
         {
             claw.move(-127);
         }
     }
-    pros::lcd::print(5, "%f", clawLift.get_position());
+    pros::lcd::print(5, "%f", clawLift.get_torque());
     //move the claw
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
@@ -206,7 +207,7 @@ void moveGoalLift()
         letGoFlag = true;
         claw.move(50);
     }
-    else if(((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag && !letGoFlag) || (clampFlag && claw.get_torque() > 2) || aFlag)
+    else if(((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag && !letGoFlag) || (clampFlag && claw.get_torque() > 1.5) || aFlag)
     {
         claw.move_velocity(0);
     }
