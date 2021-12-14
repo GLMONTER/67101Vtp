@@ -2,7 +2,7 @@
 //for std::setpercision
 #include <iomanip>
 
-#define TESTING 
+#define TESTING
 
 extern void trackPosition();
 extern void threadMacro();
