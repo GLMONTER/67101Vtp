@@ -3,7 +3,7 @@
 bool runningAuton = false;
 extern bool clawOpened;
 extern bool liftUp;
-#define Win true
+#define Win false
 //tracking wheel diameter in inches
 #define WHEEL_DIAM 2.783
 //calculate how far the wheel will travel in one rotation
@@ -132,9 +132,9 @@ float getNewPID(const float error, bool resetFlag)
     const float Kd = 0.11f;
     const float Kp = 1.5f;
     #else
-    const float Ki = 0.3;
-    const float Kd = 0.1f;
-    const float Kp = 2.0f;
+    const float Ki = 0.14;
+    const float Kd = 0.15f;
+    const float Kp = 1.6f;
     #endif
     //subject to change heading for yaw
     
@@ -297,7 +297,7 @@ moveToPoint(-10, 87.75, 0, true, 80, 2000);
 void rightElim()
 {
     frontGoalLift.move_relative(-3200, 200);
-    moveToPoint(0, 38, 0, true, 80, 2000);
+    moveToPoint(0, 38, 0, true, 90, 2000);
     frontGoalLift.move_relative(1000, 200);
     pros::delay(800);
     moveToPoint(0, 18, 0, true, 110, 2000);
@@ -305,36 +305,35 @@ void rightElim()
     frontGoalLift.move_relative(-1000, 200);
     pros::delay(750);
     intake.move(127);
-    moveToPoint(-28, 23.5, 3.14, true, 110, 2000);
-    moveToPoint(-28, 23.5, 6.28, true, 110, 2000);
-    moveToPoint(-30.5, 38, 6.28, true, 110, 2000);
+    moveToPoint(-28, 23.5, 3.14, true, 95, 2000);
+    moveToPoint(-28, 23.5, 6.28, true, 95, 2000);
+    moveToPoint(-28, 38, 6.28, true, 95, 2000);
     frontGoalLift.move_relative(1000, 200);
     pros::delay(750);
-    moveToPoint(-30.5, 18, 6.28, true, 110, 2000);
-    moveToPoint(-30.5, 18, 3.14, true, 110, 2000);
+    moveToPoint(-28, 20, 6.28, true, 95, 2000);
+    moveToPoint(-28, 20, 4.71, true, 95, 2000);
 }
 void rightQuali()
 {
-moveToPoint(0, 0, 1.57, true, 100);
     frontGoalLift.move_relative(-3200, 200);
-    moveToPoint(0, 39, 0, true, 90, 2000);
+    moveToPoint(0, 37, 0, true, 110, 2000);
 
     frontGoalLift.move_relative(1000, 200);
     pros::delay(600);
     moveToPoint(0, 18, 0, true, 100);
-    moveToPoint(0, 18, -1.57, true, 100, 2000);
+    moveToPoint(0, 18, -1.57, true, 127, 1300);
     frontGoalLift.move_relative(-2200, 200);
-     moveToPoint(-6, 18, -1.57, true, 100, 2000);
+     moveToPoint(-6, 18, -1.57, true, 110, 2000);
      frontGoalLift.move_absolute(0, 200);
      moveToPoint(0, 18, -1.57, true, 100, 2000);
      moveToPoint(0, 18, 1.57, true, 100, 2000);
       moveToPoint(8.5, 30.5, 1.57, true, 100, 2000);
-      moveToPoint(15, 22, 2.42, true, 80, 2000);
+      moveToPoint(15, 22, 2.42, true, 100, 2000);
       intake.move(-127);
     pros::delay(750);
     intake.move(0);
-    moveToPoint(20.5, 28.5, 2.42, true, 80, 2000);
-    moveToPoint(21, 4.75, 3, true, 80, 2000);
+    //moveToPoint(20.5, 28.5, 2.42, true, 100, 2000);
+    moveToPoint(21, 4.75, 3, true, 100, 2000);
 
 
 }
@@ -488,22 +487,22 @@ void skills()
 void leftElim()
 {
    frontGoalLift.move_relative(-3200, 200);
-   moveToPoint(0, 12, 0, true, 80, 2000);
-    moveToPoint(6, 38, 0, true, 70, 2000);
+   moveToPoint(0, 12, 0, true, 100, 2000);
+    moveToPoint(6, 38, 0, true, 90, 2000);
     frontGoalLift.move_relative(1000, 200);
     pros::delay(800);
-    moveToPoint(6, 18, 0, true, 110, 2000);
-    moveToPoint(6, 18, 2, true, 110, 2000);
+    moveToPoint(6, 18, 0, true, 100, 2000);
+    moveToPoint(6, 18, 2, true, 100, 2000);
     frontGoalLift.move_relative(-1000, 200);
     pros::delay(750);
     intake.move(127);
-    moveToPoint(34, 23.5, 3.14, true, 110, 2000);
-    moveToPoint(34, 23.5, 6.28, true, 110, 2000);
-    moveToPoint(36.5, 37, 6.28, true, 110, 2000);
+    moveToPoint(34, 23.5, 3.14, true, 100, 2000);
+    moveToPoint(34, 23.5, 6.28, true, 100, 2000);
+    moveToPoint(38, 37, 6.28, true, 100, 2000);
     frontGoalLift.move_relative(1000, 200);
     pros::delay(750);
-    moveToPoint(36.5, 18, 6.28, true, 110, 2000);
-    moveToPoint(36.5, 18, 3.14, true, 110, 2000);
+    moveToPoint(38, 18, 6.28, true, 100, 2000);
+    moveToPoint(38, 18, 4.71, true, 100, 2000);
 
 
 
@@ -516,7 +515,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    rightQuali();
+    leftElim();
     //moveToPoint(-12, 12, 1.57, false, 100, 5000);
     runningAuton = false;
 }
