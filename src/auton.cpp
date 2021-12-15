@@ -3,7 +3,7 @@
 bool runningAuton = false;
 extern bool clawOpened;
 extern bool liftUp;
-#define Win false
+#define Win true
 //tracking wheel diameter in inches
 #define WHEEL_DIAM 2.783
 //calculate how far the wheel will travel in one rotation
@@ -464,6 +464,7 @@ void skills()
     pros::delay(1000);
     liftUp = false;
     pros::delay(1000);
+    /*
     moveToPoint(-74, 34, 1.57, true, 100, 5000);
     clawLift.move_absolute(-1200, 200);
     moveToPoint(-80, 34, 1.57, true, 100, 5000);
@@ -482,6 +483,7 @@ void skills()
     clawLift.move_absolute(-4300, 200);
     moveToPoint(-78, 34, 1.57, true, 100, 5000);
     pros::delay(5000);
+    */
     
 }
 void leftElim()
@@ -515,7 +517,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    leftElim();
-    //moveToPoint(-12, 12, 1.57, false, 100, 5000);
+    skills();
+
     runningAuton = false;
 }

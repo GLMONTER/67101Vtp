@@ -2,7 +2,7 @@
 //for std::setpercision
 #include <iomanip>
 
-#define TESTING
+//#define TESTING
 
 extern void trackPosition();
 extern void threadMacro();
@@ -282,7 +282,7 @@ void drawUI()
         }
         else if(rightFront.get_temperature() < 55)
         {
-            lv_obj_set_hidden(leftFrontRedBox, true);
+            lv_obj_set_hidden(rightFrontRedBox, true);
             lv_obj_set_hidden(rightFrontGreenBox, false);
             lv_obj_align(rightFrontGreenBox, NULL, LV_ALIGN_IN_TOP_MID, 55, 25);
         }
@@ -295,7 +295,7 @@ void drawUI()
         }
         else if(rightBack.get_temperature() < 55)
         {
-            lv_obj_set_hidden(leftFrontRedBox, true);
+            lv_obj_set_hidden(leftBackRedBox, true);
             lv_obj_set_hidden(rightBackGreenBox, false);
             lv_obj_align(rightBackGreenBox, NULL, LV_ALIGN_IN_TOP_MID, 55, 120);
         }
@@ -334,9 +334,9 @@ void drawUI()
         }
         else if(clawLift.get_temperature() < 55)
         {
-            lv_obj_set_hidden(clawRedBox, true);
-            lv_obj_set_hidden(clawGreenBox, false);
-            lv_obj_align(clawGreenBox, NULL, LV_ALIGN_IN_TOP_MID, -5, 225);
+            lv_obj_set_hidden(clawLiftRedBox, true);
+            lv_obj_set_hidden(clawLiftGreenBox, false);
+            lv_obj_align(clawLiftGreenBox, NULL, LV_ALIGN_IN_TOP_MID, -5, 225);
         }
         //intake status box
         if(intake.get_temperature() >= 55)

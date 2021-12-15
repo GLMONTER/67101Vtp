@@ -24,7 +24,7 @@ extern bool runningAuton;
 
 bool clawOpened = true;
 bool liftUp = false;
-bool runningSkills = false;
+bool runningSkills = true;
 
 void threadMacro()
 {
@@ -58,10 +58,10 @@ void threadMacro()
                 }
                 if(buttonLimit.get_value() && liftUp)
                 {
-                    
                     flagLock = true;
                 }
             }
+            pros::lcd::print(4, "%s", "dumb");
             //begin normal claw code
             if(clawOpened)
             {
@@ -160,12 +160,12 @@ void moveGoalLift()
     //check to make sure the front goal lift stays above its range
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2) && frontGoalLift.get_position() < 0)
     {
-        frontGoalLift.move_velocity(127);
+        frontGoalLift.move(127);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
     {
         if(!buttonLimit.get_value())
-            frontGoalLift.move_velocity(-127);
+            frontGoalLift.move(-127);
     }
     else
     {
@@ -185,7 +185,7 @@ void moveGoalLift()
             claw.move(-127);
         }
     }
-    pros::lcd::print(5, "%f", clawLift.get_torque());
+
     //move the claw
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
@@ -205,9 +205,9 @@ void moveGoalLift()
         clampFlag = false;
         aFlag = true;
         letGoFlag = true;
-        claw.move(50);
+        claw.move_velocity(50);
     }
-    else if(((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag && !letGoFlag) || (clampFlag && claw.get_torque() > 1.5) || aFlag)
+    else if(((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag && !letGoFlag) || (clampFlag && (claw.get_torque() > 1.5)) || aFlag)
     {
         claw.move_velocity(0);
     }
