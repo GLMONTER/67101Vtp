@@ -24,7 +24,7 @@ extern bool runningAuton;
 
 bool clawOpened = true;
 bool liftUp = false;
-bool runningSkills = true;
+bool runningSkills = false;
 
 void threadMacro()
 {
@@ -120,8 +120,16 @@ void threadMacro()
         }
         if(downToggle)
         {
+        if(!runningSkills)
+        {
             if(state != 0)
                 state--;
+        }
+        else
+        {
+        if(state != 1)
+                state--;
+        }
             downToggle = false;
         }
         //go to macro
