@@ -180,44 +180,38 @@ void moveGoalLift()
         frontGoalLift.move_velocity(0);
     }
     static bool clawOpenManual = true;
-    static bool aFlag = false;
+
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {
         clawOpenManual = false;
-        aFlag = false;
     }
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {
         clawOpenManual = true;
-        aFlag = false;
     }
-    if(clawOpenManual && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_A) && !aFlag)
+    if(clawOpenManual)
     {
-        claw.move_absolute(0, 200);
+        if(!(claw.get_position() > -50 && claw.get_position() < 50))
+        {
+        if(claw.get_position() > 50)
+            claw.move(-127);
+        if(claw.get_position() < -50)
+            claw.move(127);
+        pros::lcd::print(5, "%s", "open");
+        }
     }
-    if(!clawOpenManual && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_A) && !aFlag)
+    if(!clawOpenManual)
     {
         if(claw.get_torque() < 1.5)
         {
+        pros::lcd::print(5, "%s", "torq");
             claw.move(-127);
         }
     }
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
+    if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpenManual) || (claw.get_torque() > 1.5 && !clawOpenManual && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)))
     {
-        claw.move_velocity(50);
-        aFlag = true;
-    }
-    if(aFlag && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
-    {
-        claw.move_velocity(0);
-    }
-    if(clawOpenManual && ((claw.get_position() > -50) && claw.get_position() < 50) && !aFlag)
-    {
-        claw.move_velocity(0);
-    }
-    if(!clawOpenManual && (claw.get_torque() > 1.5))
-    {
-        claw.move_velocity(0);
+    pros::lcd::print(5, "%s", "stop");
+    claw.move_velocity(0);
     }
     //if override is enabled, manually control claw lift
     if(overrideFlag)
