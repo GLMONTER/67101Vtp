@@ -24,7 +24,7 @@ extern bool runningAuton;
 
 bool clawOpened = true;
 bool liftUp = false;
-bool runningSkills = false;
+bool runningSkills = true;
 
 void threadMacro()
 {
@@ -179,47 +179,46 @@ void moveGoalLift()
     {
         frontGoalLift.move_velocity(0);
     }
-    //check if we are tring to clamp on a goal
-    static bool clampFlag = false;
-    //check if the a button is pressed
+    static bool clawOpenManual = true;
     static bool aFlag = false;
-    //check to see if the claw is trying to let go
-    static bool letGoFlag = false;
-    
-    if(clampFlag)
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+    {
+        clawOpenManual = false;
+        aFlag = false;
+    }
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+    {
+        clawOpenManual = true;
+        aFlag = false;
+    }
+    if(clawOpenManual && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_A) && !aFlag)
+    {
+        claw.move_absolute(0, 200);
+    }
+    if(!clawOpenManual && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_A) && !aFlag)
     {
         if(claw.get_torque() < 1.5)
         {
             claw.move(-127);
         }
     }
-
-    //move the claw
-    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
     {
-        clampFlag = true;
-        aFlag = false;
-        letGoFlag = false;
-    }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-    {
-        clampFlag = false;
-        aFlag = false;
-        letGoFlag = true;
-        claw.move_absolute(0, 200);
-    }
-    else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
-    {
-        clampFlag = false;
-        aFlag = true;
-        letGoFlag = true;
         claw.move_velocity(50);
+        aFlag = true;
     }
-    else if(((claw.get_position() > -50 && claw.get_position() < 50) && !clampFlag && !letGoFlag) || (clampFlag && (claw.get_torque() > 1.5)) || aFlag)
+    if(aFlag && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
     {
         claw.move_velocity(0);
     }
-    
+    if(clawOpenManual && ((claw.get_position() > -50) && claw.get_position() < 50) && !aFlag)
+    {
+        claw.move_velocity(0);
+    }
+    if(!clawOpenManual && (claw.get_torque() > 1.5))
+    {
+        claw.move_velocity(0);
+    }
     //if override is enabled, manually control claw lift
     if(overrideFlag)
     {
