@@ -24,7 +24,7 @@ extern bool runningAuton;
 
 bool clawOpened = true;
 bool liftUp = false;
-bool runningSkills = true;
+bool runningSkills = false;
 
 void threadMacro()
 {
@@ -147,7 +147,7 @@ void threadMacro()
         }
         else if(state == 3)
         {
-            clawLift.move_absolute(-4300, 200);
+            clawLift.move_absolute(-4700, 200);
         }
         //end lift code
         
