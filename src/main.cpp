@@ -1,7 +1,6 @@
 #include "../include/main.h"
 //for std::setpercision
 #include <iomanip>
-
 //#define TESTING
 
 extern void trackPosition();

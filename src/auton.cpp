@@ -283,7 +283,7 @@ intake.move(-127);
 pros::delay(500);
 intake.move(0);
 moveToPoint(-20, 0, 0, true, 80, 2000);
-moveToPoint(-22.25, 77, 0, true, 70, 6000);
+moveToPoint(-21, 77, 0, true, 70, 6000);
 intake.move(127);
 pros::delay(2000);
 intake.move(0);
@@ -316,21 +316,22 @@ void rightElim()
 void rightQuali()
 {
     frontGoalLift.move_relative(-3200, 200);
-    moveToPoint(0, 37, 0, true, 110, 2000);
+
+    moveToPoint(0, 37, 0, true, 80, 2000);
 
     frontGoalLift.move_relative(1000, 200);
     pros::delay(600);
     moveToPoint(0, 18, 0, true, 100);
     moveToPoint(0, 18, -1.57, true, 127, 1300);
-    frontGoalLift.move_relative(-2200, 200);
+    frontGoalLift.move_relative(-1000, 200);
      moveToPoint(-6, 18, -1.57, true, 110, 2000);
-     frontGoalLift.move_absolute(0, 200);
+     frontGoalLift.move_relative(3200, 200);
      moveToPoint(0, 18, -1.57, true, 100, 2000);
      moveToPoint(0, 18, 1.57, true, 100, 2000);
       moveToPoint(8.5, 30.5, 1.57, true, 100, 2000);
       moveToPoint(15, 22, 2.42, true, 100, 2000);
-      intake.move(-127);
-    pros::delay(750);
+      intake.move(127);
+    pros::delay(1050);
     intake.move(0);
     //moveToPoint(20.5, 28.5, 2.42, true, 100, 2000);
     moveToPoint(21, 4.75, 3, true, 100, 2000);
@@ -340,8 +341,8 @@ void rightQuali()
 void leftQuali()
 {
     frontGoalLift.move_relative(-3200, 200);
-     moveToPoint(6, 18, 0, true, 110, 2000);
-    moveToPoint(6, 38, 0, true, 80, 2000);
+     moveToPoint(6, 18, 0, true, 127, 2000);
+    moveToPoint(6, 38, 0, true, 127, 2000);
     frontGoalLift.move_relative(1000, 200);
     pros::delay(600);
     moveToPoint(6.25, 15, 0, true, 100, 2000);
@@ -542,9 +543,8 @@ void skills()
     clawOpened = true;
     clawLift.move_absolute(-4300, 200);
     pros::delay(1000);
-    liftUp = false;
-    pros::delay(1000);
 
+/*
     moveToPoint(-74, 34, 1.57, true, 100, 5000);
     clawLift.move_absolute(-1200, 200);
     moveToPoint(-80, 34, 1.57, true, 100, 5000);
@@ -563,6 +563,7 @@ void skills()
     clawLift.move_absolute(-4300, 200);
     moveToPoint(-78, 34, 1.57, true, 100, 5000);
     pros::delay(5000);
+    */
 
 
 }
@@ -586,14 +587,24 @@ void leftElim()
     moveToPoint(38, 18, 6.28, true, 100, 2000);
     moveToPoint(38, 18, 4.71, true, 100, 2000);
 }
+void fastElim()
+{
 
+    clawLift.move_absolute(-1200, 200);
+    moveToPoint(0, -33, 0, true, 127, 3000);
+    clawOpened = false;
+    pros::delay(500);
+    moveToPoint(0, 0, 0, true, 127);
+
+
+}
 //actually running the auton
 void runAuton()
 {
     runningAuton = true;
     init();
 
-    leftElim();
+    fastElim();
 
     runningAuton = false;
 }
