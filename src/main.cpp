@@ -423,15 +423,15 @@ pros::delay(100);
 
 void initialize()
 {
-	pros::Task trackingTask(trackPosition);
-    pros::Task macroTask(threadMacro);
+	pros::Task trackingTask(trackPosition, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "Tracking Task");
+    pros::Task macroTask(threadMacro, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "Macro Task");
     #ifndef TESTING
-    pros::Task draw(drawUI);
+    pros::Task draw(drawUI, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "UI Task");
     #else
     pros::lcd::initialize();
     #endif
 
-    pros::Task christmasLights(christmas);
+    pros::Task christmasLights(christmas, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "Light Task");
 }
 
 void disabled() {}
