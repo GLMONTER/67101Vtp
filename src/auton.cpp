@@ -187,7 +187,8 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
         else
             scaledPID = getNewPID(scaleValue, false);
         resFlag = true;
-        std::cout<<scaledPID<<std::endl;
+
+        //left front
 		if(std::abs((sin(T + 0.25*PI) + differenceOfAngle * 4) * std::abs(scaledPID)) > maxVelocity)
         {
             if((sin(T + 0.25*PI) + differenceOfAngle * 4) * std::abs(scaledPID) > 0)

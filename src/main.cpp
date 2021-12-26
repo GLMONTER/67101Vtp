@@ -379,46 +379,46 @@ pros::ADIDigitalOut gLight('G');
 
 void christmas()
 {
-while(true)
-{
-//turn all off
-aLight.set_value(HIGH);
-bLight.set_value(HIGH);
-cLight.set_value(HIGH);
-dLight.set_value(HIGH);
-eLight.set_value(HIGH);
-fLight.set_value(HIGH);
-gLight.set_value(HIGH);
+    while(true)
+    {
+        //turn all off
+        aLight.set_value(HIGH);
+        bLight.set_value(HIGH);
+        cLight.set_value(HIGH);
+        dLight.set_value(HIGH);
+        eLight.set_value(HIGH);
+        fLight.set_value(HIGH);
+        gLight.set_value(HIGH);
 
-//start sequence
-aLight.set_value(LOW);
+        //start sequence
+        aLight.set_value(LOW);
 
-pros::delay(100);
-bLight.set_value(LOW);
-aLight.set_value(HIGH);
+        pros::delay(100);
+        bLight.set_value(LOW);
+        aLight.set_value(HIGH);
 
-pros::delay(100);
-cLight.set_value(LOW);
-bLight.set_value(HIGH);
+        pros::delay(100);
+        cLight.set_value(LOW);
+        bLight.set_value(HIGH);
 
-pros::delay(100);
-dLight.set_value(LOW);
-cLight.set_value(HIGH);
+        pros::delay(100);
+        dLight.set_value(LOW);
+        cLight.set_value(HIGH);
 
-pros::delay(100);
-eLight.set_value(LOW);
-dLight.set_value(HIGH);
+        pros::delay(100);
+        eLight.set_value(LOW);
+        dLight.set_value(HIGH);
 
-pros::delay(100);
-fLight.set_value(LOW);
-eLight.set_value(HIGH);
+        pros::delay(100);
+        fLight.set_value(LOW);
+        eLight.set_value(HIGH);
 
-pros::delay(100);
-gLight.set_value(LOW);
-fLight.set_value(HIGH);
+        pros::delay(100);
+        gLight.set_value(LOW);
+        fLight.set_value(HIGH);
 
-pros::delay(100);
-}
+        pros::delay(100);
+    }
 }
 
 void initialize()
