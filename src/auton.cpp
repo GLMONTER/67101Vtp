@@ -33,8 +33,6 @@ typedef struct _pos
 sPos gPosition;
 
 
-
-
 void trackPosition()
 {    
     middleEncoder.reverse();
@@ -50,96 +48,104 @@ void trackPosition()
 
     while(true)
     {
-    /*
+        //get encoder position based on a 360 tick rotation
+        float left = leftEncoder.get_position();
+        float right = rightEncoder.get_position();
+        float back = middleEncoder.get_position();
+
+        float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
+        float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
+        float S = (back - gPosition.backLst) * SPIN_TO_IN_LR; // The amount the back side of the robot moved
+
+        // Update the last values
+        gPosition.leftLst = left;
+        gPosition.rightLst = right;
+        gPosition.backLst = back;
+
+        float h; // The hypotenuse of the triangle formed by the middle of the robot on the starting position and ending position and the middle of the circle it travels around
+        float i; // Half on the angle that I've traveled
+        float h2; // The same as h but using the back instead of the side wheels
+        float a = (L - R) / (L_DISTANCE_IN + R_DISTANCE_IN); // The angle that I've traveled
+        if (a)
         {
-            pros::lcd::print(0, "X : %f", chassis->getState().x * 39.37);
-            pros::lcd::print(1, "Y : %f", chassis->getState().y* 39.37);
-            pros::lcd::print(2, "R : %f", chassis->getState().theta);
-            pros::delay(10);
-            continue;
+            float r = R / a; // The radius of the circle the robot travel's around with the right side of the robot
+            i = a / 2.0;
+            float sinI = sin(i);
+            h = ((r + R_DISTANCE_IN) * sinI) * 2.0;
+
+            float r2 = S / a; // The radius of the circle the robot travel's around with the back of the robot
+            h2 = ((r2 + S_DISTANCE_IN) * sinI) * 2.0;
         }
-    */
-    //get encoder position based on a 360 tick rotation
-    float left = leftEncoder.get_position();
-    float right = rightEncoder.get_position();
-    float back = middleEncoder.get_position();
+        else
+        {
+            h = R;
+            i = 0;
 
-    float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
-	float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
-	float S = (back - gPosition.backLst) * SPIN_TO_IN_LR; // The amount the back side of the robot moved
+            h2 = S;
+        }
+        float p = i + gPosition.a; // The global ending angle of the robot
+        float cosP = cos(p);
+        float sinP = sin(p);
 
-	// Update the last values
-	gPosition.leftLst = left;
-	gPosition.rightLst = right;
-	gPosition.backLst = back;
+        // Update the global position
+        gPosition.y += h * cosP;
+        gPosition.x += h * sinP;
 
-	float h; // The hypotenuse of the triangle formed by the middle of the robot on the starting position and ending position and the middle of the circle it travels around
-	float i; // Half on the angle that I've traveled
-	float h2; // The same as h but using the back instead of the side wheels
-	float a = (L - R) / (L_DISTANCE_IN + R_DISTANCE_IN); // The angle that I've traveled
-	if (a)
-	{
-		float r = R / a; // The radius of the circle the robot travel's around with the right side of the robot
-		i = a / 2.0;
-		float sinI = sin(i);
-		h = ((r + R_DISTANCE_IN) * sinI) * 2.0;
+        gPosition.y += h2 * -sinP;
+        gPosition.x += h2 * cosP; 
 
-		float r2 = S / a; // The radius of the circle the robot travel's around with the back of the robot
-		h2 = ((r2 + S_DISTANCE_IN) * sinI) * 2.0;
-	}
-	else
-	{
-		h = R;
-		i = 0;
+        gPosition.a += a;
 
-		h2 = S;
-	}
-	float p = i + gPosition.a; // The global ending angle of the robot
-	float cosP = cos(p);
-	float sinP = sin(p);
+        pros::lcd::print(0, "X : %f", gPosition.x);
+        pros::lcd::print(1, "Y : %f", gPosition.y);
+        pros::lcd::print(2, "R : %f", gPosition.a);
 
-	// Update the global position
-	gPosition.y += h * cosP;
-	gPosition.x += h * sinP;
-
-	gPosition.y += h2 * -sinP;
-	gPosition.x += h2 * cosP; 
-
-	gPosition.a += a;
-
-    pros::lcd::print(0, "X : %f", gPosition.x);
-    pros::lcd::print(1, "Y : %f", gPosition.y);
-    pros::lcd::print(2, "R : %f", gPosition.a);
-
-    pros::delay(5);
+        pros::delay(5);
     }
 }
 
-float getNewPID(const float error, bool resetFlag)
+float getNewPID(const float error, bool resetFlag, const float Pgain = 0.0f, const float iGain = 0.0f, const float dGain = 0.0f)
 {
    // static float error;
     static float integral;
     static float derivative;
     static float previousError;
+
+    //pid gains
+    float Ki;
+    float Kd;
+    float Kp;
+
     if(resetFlag)
     {
         integral = 0;
         derivative = 0;
         previousError = 0;
     }
-    #if Win
-   const float Ki = 0.1;
-    const float Kd = 0.11f;
-    const float Kp = 1.5f;
-    #else
-    const float Ki = 0.14;
-    const float Kd = 0.15f;
-    const float Kp = 1.6f;
-    #endif
-    //subject to change heading for yaw
-    
+    //if gains are default, use default gains
+    if (Pgain == 0.0f && iGain == 0.0f && dGain == 0.0f)
+    {
+        #if Win
+        Ki = 0.1;
+        Kd = 0.11f;
+        Kp = 1.5f;
+        #else
+        Ki = 0.14;
+        Kd = 0.15f;
+        Kp = 1.6f;
+        #endif
+    }
+    //if not use custom gains
+    else
+    {
+        Ki = iGain;
+        Kd = dGain;
+        Kp = Pgain;
+    }
+       
     integral = integral + error;
     
+    //if the error is small delete integral to prevent overshoot
     if(abs(error) < 0.5f)
     {
         integral = 0.0f;
@@ -154,7 +160,9 @@ void init()
 {
     
 }
-void moveToPoint(const float x, const float y, const float angle, bool goThroughFlag, const uint32_t maxVelocity = 127, uint32_t timeout = 0)
+
+void moveToPoint(const float x, const float y, const float angle, bool goThroughFlag, const uint32_t maxVelocity = 127, uint32_t timeout = 0
+, const float Pgain = 0.0f, const float iGain = 0.0f, const float dGain = 0.0f)
 {
     leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
     leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
