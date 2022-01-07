@@ -3,6 +3,9 @@
 bool runningAuton = false;
 extern bool clawOpened;
 extern bool liftUp;
+
+bool grabFlag = false;
+
 #define Win true
 //tracking wheel diameter in inches
 #define WHEEL_DIAM 2.783
@@ -14,11 +17,36 @@ float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 36000);
 #define R_DISTANCE_IN 4.025
 //distance from the rear tracking wheel to tracking center
 #define S_DISTANCE_IN 2.25
+
 extern pros::ADIDigitalIn buttonLimit;
 
 pros::Rotation leftEncoder(17);
 pros::Rotation rightEncoder(4);
 pros::Rotation middleEncoder(18);
+
+pros::Distance frontDistance(15);
+
+void distanceGrab()
+{
+    while(true)
+    {
+        while(grabFlag)
+        {
+            pros::lcd::print(7, "%d", frontDistance.get());
+            if(frontDistance.get() != 0)
+            {
+                if(-(1600 - frontDistance.get() * 2.5) < 0)
+                {
+                    pros::lcd::print(6, "%f", -(1600 - frontDistance.get() * 2.5));
+                    claw.move_absolute(-(1600 - frontDistance.get() * 2.5), 200);
+                }
+                
+            }
+            pros::delay(10);
+        }
+        pros::delay(10);
+    }
+}
 
 typedef struct _pos
 {
@@ -288,19 +316,18 @@ void winPointold()
 }
 void winPoint()
 {
-intake.move(-127);
-pros::delay(500);
-intake.move(0);
-moveToPoint(-20, 0, 0, true, 80, 2000);
-moveToPoint(-21, 77, 0, true, 70, 6000);
-intake.move(127);
-pros::delay(2000);
-intake.move(0);
-moveToPoint(-22.25, 74, 0, true, 80, 2000);
-moveToPoint(-38, 77.25, 0, true, 80, 2000);
-moveToPoint(-37, 87, 0, true, 80, 2000);
-moveToPoint(-10, 87.75, 0, true, 80, 2000);
-
+    intake.move(-127);
+    pros::delay(500);
+    intake.move(0);
+    moveToPoint(-20, 0, 0, true, 80, 2000);
+    moveToPoint(-21, 77, 0, true, 70, 6000);
+    intake.move(127);
+    pros::delay(2000);
+    intake.move(0);
+    moveToPoint(-22.25, 74, 0, true, 80, 2000);
+    moveToPoint(-38, 77.25, 0, true, 80, 2000);
+    moveToPoint(-37, 87, 0, true, 80, 2000);
+    moveToPoint(-10, 87.75, 0, true, 80, 2000);
 }
 
 void rightElim()
@@ -333,13 +360,13 @@ void rightQuali()
     moveToPoint(0, 18, 0, true, 100);
     moveToPoint(0, 18, -1.57, true, 127, 1300);
     frontGoalLift.move_relative(-1000, 200);
-     moveToPoint(-6, 18, -1.57, true, 110, 2000);
-     frontGoalLift.move_relative(3200, 200);
-     moveToPoint(0, 18, -1.57, true, 100, 2000);
-     moveToPoint(0, 18, 1.57, true, 100, 2000);
-      moveToPoint(8.5, 30.5, 1.57, true, 100, 2000);
-      moveToPoint(15, 22, 2.42, true, 100, 2000);
-      intake.move(127);
+    moveToPoint(-6, 18, -1.57, true, 110, 2000);
+    frontGoalLift.move_relative(3200, 200);
+    moveToPoint(0, 18, -1.57, true, 100, 2000);
+    moveToPoint(0, 18, 1.57, true, 100, 2000);
+    moveToPoint(8.5, 30.5, 1.57, true, 100, 2000);
+    moveToPoint(15, 22, 2.42, true, 100, 2000);
+    intake.move(127);
     pros::delay(1050);
     intake.move(0);
     //moveToPoint(20.5, 28.5, 2.42, true, 100, 2000);
@@ -350,7 +377,7 @@ void rightQuali()
 void leftQuali()
 {
     frontGoalLift.move_relative(-3200, 200);
-     moveToPoint(6, 18, 0, true, 127, 2000);
+    moveToPoint(6, 18, 0, true, 127, 2000);
     moveToPoint(6, 38, 0, true, 127, 2000);
     frontGoalLift.move_relative(1000, 200);
     pros::delay(600);
@@ -573,8 +600,6 @@ void skills()
     moveToPoint(-78, 34, 1.57, true, 100, 5000);
     pros::delay(5000);
     */
-
-
 }
 void leftElim()
 {
@@ -613,7 +638,8 @@ void runAuton()
     runningAuton = true;
     init();
 
-    fastElim();
-
+   // fastElim();
+    grabFlag = true;
+    pros::delay(50000);
     runningAuton = false;
 }

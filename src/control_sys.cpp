@@ -22,13 +22,14 @@ bool overrideFlag = false;
 //to check if we are running the auton, for use in the multithreaded task
 extern bool runningAuton;
 
+extern bool grabFlag;
+
 bool clawOpened = true;
 bool liftUp = false;
 bool runningSkills = false;
 
 void threadMacro()
 {
-
     int state = 0;
 
     int upPressed = 0;
@@ -38,6 +39,7 @@ void threadMacro()
     int downToggle = 0;
     
     int flagLock = false;
+
     while(true)
     {
         if(runningAuton)
@@ -61,22 +63,25 @@ void threadMacro()
                     flagLock = true;
                 }
             }
-            pros::lcd::print(4, "%s", "dumb");
-            //begin normal claw code
-            if(clawOpened)
+            //if the grabDistance task is executing do not run.
+            if(!grabFlag)
             {
-                claw.move_absolute(0, 200);
-            }
-            if(!clawOpened)
-            {
-                if(claw.get_torque() < 1.5)
+                //begin normal claw code
+                if(clawOpened)
                 {
-                    claw.move(-127);
+                    claw.move_absolute(0, 200);
                 }
-            }
-            if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpened) || (!clawOpened && claw.get_torque() > 1.5))
-            {
-                claw.move_velocity(0);
+                if(!clawOpened)
+                {
+                    if(claw.get_torque() < 1.5)
+                    {
+                        claw.move(-127);
+                    }
+                }
+                if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpened) || (!clawOpened && claw.get_torque() > 1.5))
+                {
+                    claw.move_velocity(0);
+                }
             }
         }
         //begin lift code
@@ -151,8 +156,6 @@ void threadMacro()
         }
         //end lift code
         
-
-
         pros::delay(10);
     }
 }
@@ -211,13 +214,12 @@ void moveGoalLift()
     {
         if(claw.get_torque() < 1.5)
         {
-            pros::lcd::print(5, "%s", "torq");
+            pros::lcd::print(5, "%f", claw.get_position());
             claw.move(-127);
         }
     }
     if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpenManual) || aFlag || (claw.get_torque() > 1.5 && !clawOpenManual && !controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)))
     {
-        pros::lcd::print(5, "%s", "stop");
         if(!controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
             claw.move_velocity(0);
     }

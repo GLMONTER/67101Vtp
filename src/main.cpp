@@ -1,10 +1,12 @@
 #include "../include/main.h"
 //for std::setpercision
 #include <iomanip>
-//#define TESTING
+
+#define TESTING
 
 extern void trackPosition();
 extern void threadMacro();
+extern void distanceGrab();
 
 extern pros::Rotation leftEncoder;
 extern pros::Rotation middleEncoder;
@@ -23,7 +25,6 @@ typedef struct _pos
 //for screen write
 extern sPos gPosition;
 
-
 extern bool runningAuton;
 
 //a structure that is filled with string stream
@@ -32,6 +33,7 @@ struct outputPos
     std::string x, y, a;
 };
 outputPos writerPos;
+
 #ifndef TESTING
 //task to draw the ui on screen
 void drawUI()
@@ -432,6 +434,10 @@ void initialize()
     #endif
 
     pros::Task christmasLights(christmas, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "Light Task");
+
+    pros::Task distanceTask(distanceGrab, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "distanceGrab");
+
+    claw.tare_position();
 }
 
 void disabled() {}
