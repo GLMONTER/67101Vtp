@@ -4,6 +4,7 @@ bool runningAuton = false;
 extern bool clawOpened;
 extern bool liftUp;
 
+//related to distance sensor
 bool grabFlag = false;
 
 #define Win true
@@ -32,21 +33,17 @@ void distanceGrab()
     {
         while(grabFlag)
         {
-            pros::lcd::print(7, "%d", frontDistance.get());
-            if(frontDistance.get() != 0)
+            if(frontDistance.get() < 100 && frontDistance.get() != 0)
             {
-                if(-(1600 - frontDistance.get() * 2.5) < 0)
-                {
-                    pros::lcd::print(6, "%f", -(1600 - frontDistance.get() * 2.5));
-                    claw.move_absolute(-(1600 - frontDistance.get() * 2.5), 200);
-                }
-                
+                clawOpened = false;
+                grabFlag = false;
             }
             pros::delay(10);
         }
         pros::delay(10);
     }
 }
+
 
 typedef struct _pos
 {
@@ -59,7 +56,14 @@ typedef struct _pos
 } sPos; // Position of the robot
 
 sPos gPosition;
+void setDrive(int32_t left, int32_t right)
+{
+    rightFront.move(right);
+    rightBack.move(right);
 
+    leftFront.move(left);
+    leftBack.move(left);
+}
 
 void trackPosition()
 {    
@@ -623,14 +627,18 @@ void leftElim()
 }
 void fastElim()
 {
-
+    grabFlag = true;
     clawLift.move_absolute(-1200, 200);
-    moveToPoint(0, -33, 0, true, 127, 3000);
-    clawOpened = false;
-    pros::delay(500);
-    moveToPoint(0, 0, 0, true, 127);
+    claw.move_absolute(-1000, 200);
 
+    while(grabFlag)
+    {
+        setDrive(-127, -127);
+    }
 
+    setDrive(127,127);
+    pros::delay(1750);
+    setDrive(0,0);
 }
 //actually running the auton
 void runAuton()
@@ -638,8 +646,8 @@ void runAuton()
     runningAuton = true;
     init();
 
-   // fastElim();
-    grabFlag = true;
+    fastElim();
+
     pros::delay(50000);
     runningAuton = false;
 }
