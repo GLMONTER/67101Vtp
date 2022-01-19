@@ -12,6 +12,8 @@ bool grabFlag = false;
 #define WHEEL_DIAM 2.783
 //calculate how far the wheel will travel in one rotation
 float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 36000);
+float SPIN_TO_IN_LR_M  = (WHEEL_DIAM * PI / 360);
+
 //distance from the left tracking wheel to tracking center
 #define L_DISTANCE_IN 4.025
 //distance from the right tracking wheel to tracking center
@@ -23,7 +25,8 @@ extern pros::ADIDigitalIn buttonLimit;
 
 pros::Rotation leftEncoder(17);
 pros::Rotation rightEncoder(4);
-pros::Rotation middleEncoder(18);
+
+pros::ADIEncoder middleEncoder(1, 2, true);
 
 pros::Distance frontDistance(15);
 
@@ -67,27 +70,25 @@ void setDrive(int32_t left, int32_t right)
 
 void trackPosition()
 {    
-    middleEncoder.reverse();
     //reset position because position is a set state
     leftEncoder.reset_position();
     rightEncoder.reset_position();
-    middleEncoder.reset_position();
+    middleEncoder.reset();
 
     //update encoders every 5 miliseconds
     leftEncoder.set_data_rate(5);
     rightEncoder.set_data_rate(5);
-    middleEncoder.set_data_rate(5);
 
     while(true)
     {
         //get encoder position based on a 360 tick rotation
         float left = leftEncoder.get_position();
         float right = rightEncoder.get_position();
-        float back = middleEncoder.get_position();
+        float back = middleEncoder.get_value();
 
         float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
         float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
-        float S = (back - gPosition.backLst) * SPIN_TO_IN_LR; // The amount the back side of the robot moved
+        float S = (back - gPosition.backLst) * SPIN_TO_IN_LR_M; // The amount the back side of the robot moved
 
         // Update the last values
         gPosition.leftLst = left;
@@ -127,11 +128,15 @@ void trackPosition()
         gPosition.x += h2 * cosP; 
 
         gPosition.a += a;
-
+        
         pros::lcd::print(0, "X : %f", gPosition.x);
         pros::lcd::print(1, "Y : %f", gPosition.y);
         pros::lcd::print(2, "R : %f", gPosition.a);
-
+/*
+        pros::lcd::print(0, "X : %f", left);
+        pros::lcd::print(1, "Y : %f", right);
+        pros::lcd::print(2, "R : %f", back);
+*/
         pros::delay(5);
     }
 }
