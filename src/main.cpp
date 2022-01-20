@@ -428,7 +428,7 @@ void initialize()
 
     pros::Task christmasLights(christmas, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "Light Task");
 
-    pros::Task distanceTask(distanceGrab, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "distanceGrab");
+   // pros::Task distanceTask(distanceGrab, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "distanceGrab");
 
     claw.tare_position();
 }

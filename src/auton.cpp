@@ -26,7 +26,7 @@ extern pros::ADIDigitalIn buttonLimit;
 pros::Rotation leftEncoder(17);
 pros::Rotation rightEncoder(4);
 
-pros::ADIEncoder middleEncoder(1, 2, true);
+pros::ADIEncoder middleEncoder(1, 2, false);
 
 pros::Distance frontDistance(15);
 
@@ -34,14 +34,17 @@ void distanceGrab()
 {
     while(true)
     {
+        pros::lcd::print(6, "%d", grabFlag);
+
         while(grabFlag)
         {
-            if(frontDistance.get() < 100 && frontDistance.get() != 0)
+            if(frontDistance.get() < 200 && frontDistance.get() != 0)
             {
                 clawOpened = false;
                 grabFlag = false;
             }
             pros::delay(10);
+            pros::lcd::print(5, "%f", frontDistance.get());
         }
         pros::delay(10);
     }
@@ -634,15 +637,25 @@ void fastElim()
 {
     grabFlag = true;
     clawLift.move_absolute(-1200, 200);
-    claw.move_absolute(-1000, 200);
+    claw.move_absolute(-950, 200);
 
+    pros::lcd::print(6, "%d", grabFlag);
+    setDrive(-127, -127);
     while(grabFlag)
     {
-        setDrive(-127, -127);
-    }
+        if(frontDistance.get() < 325 && frontDistance.get() != 0)
+        {
+            clawOpened = false;
+            grabFlag = false;
 
-    setDrive(127,127);
-    pros::delay(1750);
+        }
+        pros::delay(10);
+        pros::lcd::print(5, "%f", frontDistance.get());
+    }
+    
+        clawLift.move_absolute(-1600, 200);
+
+    moveToPoint(0,0,0, false);
     setDrive(0,0);
 }
 //actually running the auton

@@ -144,15 +144,15 @@ void threadMacro()
         }
         else if(state == 1)
         {
-            clawLift.move_absolute(-1350, 200);
+            clawLift.move_absolute(-1100, 200);
         }
         else if(state == 2)
         {
-            clawLift.move_absolute(-3400, 200);
+            clawLift.move_absolute(-3200, 200);
         }
         else if(state == 3)
         {
-            clawLift.move_absolute(-4700, 200);
+            clawLift.move_absolute(-4500, 200);
         }
         //end lift code
         
