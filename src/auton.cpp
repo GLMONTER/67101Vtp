@@ -9,26 +9,27 @@ bool grabFlag = false;
 
 #define Win true
 //tracking wheel diameter in inches
-#define WHEEL_DIAM 2.783
+#define WHEEL_DIAM 3.25
+
 //calculate how far the wheel will travel in one rotation
 float SPIN_TO_IN_LR  = (WHEEL_DIAM * PI / 36000);
-float SPIN_TO_IN_LR_M  = (WHEEL_DIAM * PI / 360);
 
 //distance from the left tracking wheel to tracking center
-#define L_DISTANCE_IN 4.025
+#define L_DISTANCE_IN 5.25
 //distance from the right tracking wheel to tracking center
-#define R_DISTANCE_IN 4.025
+#define R_DISTANCE_IN 4.15
 //distance from the rear tracking wheel to tracking center
-#define S_DISTANCE_IN 2.25
+#define S_DISTANCE_IN 2
 
 extern pros::ADIDigitalIn buttonLimit;
 
 pros::Rotation leftEncoder(17);
 pros::Rotation rightEncoder(4);
 
-pros::ADIEncoder middleEncoder(1, 2, false);
+pros::Rotation middleEncoder(18);
 
 pros::Distance frontDistance(15);
+
 
 void distanceGrab()
 {
@@ -64,34 +65,37 @@ typedef struct _pos
 sPos gPosition;
 void setDrive(int32_t left, int32_t right)
 {
-    rightFront.move(right);
-    rightBack.move(right);
+    rightFront.move_velocity(right);
+    rightBack.move_velocity(right);
 
-    leftFront.move(left);
-    leftBack.move(left);
+    leftFront.move_velocity(left);
+    leftBack.move_velocity(left);
 }
+
 
 void trackPosition()
 {    
+    middleEncoder.reverse();
     //reset position because position is a set state
     leftEncoder.reset_position();
     rightEncoder.reset_position();
-    middleEncoder.reset();
+    middleEncoder.reset_position();
 
     //update encoders every 5 miliseconds
     leftEncoder.set_data_rate(5);
     rightEncoder.set_data_rate(5);
+    middleEncoder.set_data_rate(5);
 
     while(true)
     {
         //get encoder position based on a 360 tick rotation
         float left = leftEncoder.get_position();
         float right = rightEncoder.get_position();
-        float back = middleEncoder.get_value();
+        float back = middleEncoder.get_position();
 
         float L = (left - gPosition.leftLst) * SPIN_TO_IN_LR; // The amount the left side of the robot moved
         float R = (right - gPosition.rightLst) * SPIN_TO_IN_LR; // The amount the right side of the robot moved
-        float S = (back - gPosition.backLst) * SPIN_TO_IN_LR_M; // The amount the back side of the robot moved
+        float S = (back - gPosition.backLst) * SPIN_TO_IN_LR; // The amount the back side of the robot moved
 
         // Update the last values
         gPosition.leftLst = left;
@@ -131,19 +135,14 @@ void trackPosition()
         gPosition.x += h2 * cosP; 
 
         gPosition.a += a;
-        
+
         pros::lcd::print(0, "X : %f", gPosition.x);
         pros::lcd::print(1, "Y : %f", gPosition.y);
         pros::lcd::print(2, "R : %f", gPosition.a);
-/*
-        pros::lcd::print(0, "X : %f", left);
-        pros::lcd::print(1, "Y : %f", right);
-        pros::lcd::print(2, "R : %f", back);
-*/
+
         pros::delay(5);
     }
 }
-
 float getNewPID(const float error, bool resetFlag, const float Pgain = 0.0f, const float iGain = 0.0f, const float dGain = 0.0f)
 {
    // static float error;
@@ -228,7 +227,7 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 		float scaleValue = std::abs(std::sqrt(std::pow((gPosition.x - x), 2) + std::pow((gPosition.y - y), 2))) + (3 * differenceOfAngle);
 		//What direction to drive in
         float T = std::atan2((y - gPosition.y), (x - gPosition.x)) + gPosition.a;
-       float scaledPID;
+        float scaledPID;
 		//use pid to move elegantly to the target
         if(!resFlag)
 		    scaledPID = getNewPID(scaleValue, true);
@@ -304,42 +303,21 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
         rightBack.move(0); 
    }
 }
-void winPointold()
-{
-    frontGoalLift.move_absolute(-3800, 200);
-    pros::delay(800);
-    intake.move(127);
-    moveToPoint(0, -4.8, 0, true, 80, 3000);
-    intake.move(0);
-  //  moveToPoint(-24, -6.8, 0, true, 100, 3000);
-    moveToPoint(-20, -4.8, 3.14, true, 80, 3000);
-    clawLift.move_absolute(-1200, 200);
-    moveToPoint(-16.5, 74.5, 3.14, true, 85, 4000);
-    clawOpened = true;
-    pros::delay(500);
-    moveToPoint(-33, 66, 1.57, true, 100, 2000);
-    moveToPoint(-40, 69, 1.57, true, 90, 1500);
-    claw.move_absolute(-300, 200);
-    pros::delay(500);
-    clawLift.move_absolute(-3000, 200);
-    //moveToPoint(-40, 66, 0.82, true, 100, 3000);
-    moveToPoint(-8, 87, 1, true, 127, 3000);
-    frontGoalLift.move_absolute(-3000, 200);
-}
+
 void winPoint()
 {
     intake.move(-127);
     pros::delay(500);
     intake.move(0);
-    moveToPoint(-20, 0, 0, true, 80, 2000);
-    moveToPoint(-21, 77, 0, true, 70, 6000);
+    moveToPoint(-29, 0, 0, true, 80, 2000);
+    moveToPoint(-30, 89, 0, true, 70, 6000);
     intake.move(127);
     pros::delay(2000);
     intake.move(0);
-    moveToPoint(-22.25, 74, 0, true, 80, 2000);
-    moveToPoint(-38, 77.25, 0, true, 80, 2000);
-    moveToPoint(-37, 87, 0, true, 80, 2000);
-    moveToPoint(-10, 87.75, 0, true, 80, 2000);
+    moveToPoint(-31.25, 83, 0, true, 80, 2000);
+    moveToPoint(-45, 89.25, 0, true, 80, 2000);
+    moveToPoint(-44, 98, 0, true, 80, 2000);
+    moveToPoint(-17, 99, 0, true, 80, 2000);
 }
 
 void rightElim()
@@ -407,105 +385,7 @@ void leftQuali()
 
 
 }
-void oldSkills()
-{
-     //lift up counter weight
-    liftUp = true;
-    while(!buttonLimit.get_value())
-    {
-        pros::delay(5);
-    }
-    //drive away from platform
-    moveToPoint(0, -4.8, 0, true, 90, 4000);
-    //turn towards first goal
-     clawLift.move_absolute(-1200, 200);
-    moveToPoint(-18.5, 5, 1.57, true, 90, 4000);
 
-    moveToPoint(-39, 5, 1.57, false, 90, 4000);
-    clawOpened = false;
-    pros::delay(700);
-    clawLift.move_absolute(-4300, 200);
-    pros::delay(1500);
-    moveToPoint(-27, 3.6, 1.57, true, 90, 4000);
-    moveToPoint(-28, 35, 1.57, true, 100, 4000);
-    moveToPoint(-30, 35, 4.57, true, 90, 4000);
-    moveToPoint(-19, 35, 4.57, true, 90, 2500);
-
-    clawLift.move_absolute(-3400, 200);
-    pros::delay(500);
-    clawOpened = true;
-    pros::delay(1500);
-    clawLift.move_absolute(-4500, 200);
-
-    moveToPoint(-25, 35, 4.57, true, 90, 2500);
-
-    moveToPoint(-36, 34, 1.57, true, 127, 5000);
-    clawLift.move_absolute(-1200, 200);
-    //moveToPoint(-56, 31, 3.14, true, 127, 5000);
-    moveToPoint(-68, 33, 1.57, true, 127, 5000);
-
-    clawLift.move_absolute(-1200, 200);
-    clawOpened = true;
-    //go get last neutral
-    moveToPoint(-49, 53, 3.14, true, 100, 5000);
-    moveToPoint(-49, 59, 3.14, false, 80, 5000);
-
-    clawOpened = false;
-    pros::delay(700);
-    clawLift.move_absolute(-4300, 200);
-    pros::delay(1500);
-    moveToPoint(-30, 28, 4.57, true, 90, 5000);
-    moveToPoint(-19, 28, 4.57, true, 90, 5000);
-    //lay last neut down
-    clawLift.move_absolute(-3400, 200);
-    pros::delay(500);
-    clawOpened = true;
-    pros::delay(1000);
-
-
-    moveToPoint(-21, 65, 3.14, true, 80, 5000);
-
-    clawLift.move_absolute(-1200, 200);
-    clawOpened = true;
-
-    //move towards blue alliance
-    moveToPoint(-21, 77.7, 3.14, false, 80, 4000);
-    //clamp
-    clawOpened = false;
-
-    pros::delay(700);
-    moveToPoint(-21, 73, 3.14, false, 90, 4000);
-    clawLift.move_absolute(-4300, 200);
-    pros::delay(1250);
-    moveToPoint(-82, 50, 1.57, false, 100, 5000);
-    moveToPoint(-85.75, 33, 1.57, true, 100, 5000);
-    clawLift.move_absolute(-3000, 200);
-    pros::delay(500);
-    clawOpened = true;
-    clawLift.move_absolute(-4300, 200);
-    pros::delay(1000);
-    liftUp = false;
-    pros::delay(1000);
-
-    moveToPoint(-74, 34, 1.57, true, 100, 5000);
-    clawLift.move_absolute(-1200, 200);
-    moveToPoint(-80, 34, 1.57, true, 100, 5000);
-    moveToPoint(-80, 34, 4.71, true, 100, 5000);
-    moveToPoint(-75, 34, 4.71, true, 100, 5000);
-    //grab rear goal
-    clawOpened = false;
-    pros::delay(500);
-    clawLift.move_absolute(-4300, 200);
-    pros::delay(1000);
-    moveToPoint(-85.75, 34, 1.57, true, 100, 5000);
-    clawLift.move_absolute(-3000, 200);
-    pros::delay(500);
-    clawOpened = true;
-    pros::delay(500);
-    clawLift.move_absolute(-4300, 200);
-    moveToPoint(-78, 34, 1.57, true, 100, 5000);
-    pros::delay(5000);
-}
 void skills()
 {
 
@@ -637,10 +517,11 @@ void fastElim()
 {
     grabFlag = true;
     clawLift.move_absolute(-1200, 200);
-    claw.move_absolute(-950, 200);
+    claw.move_absolute(-600, 200);
 
     pros::lcd::print(6, "%d", grabFlag);
-    setDrive(-127, -127);
+    setDrive(-200, -200);
+
     while(grabFlag)
     {
         if(frontDistance.get() < 325 && frontDistance.get() != 0)
@@ -653,7 +534,7 @@ void fastElim()
         pros::lcd::print(5, "%f", frontDistance.get());
     }
     
-        clawLift.move_absolute(-1600, 200);
+    clawLift.move_absolute(-1600, 200);
 
     moveToPoint(0,0,0, false);
     setDrive(0,0);
@@ -664,8 +545,8 @@ void runAuton()
     runningAuton = true;
     init();
 
-    fastElim();
+    winPoint();
 
-    pros::delay(50000);
+
     runningAuton = false;
 }

@@ -8,7 +8,7 @@ pros::Motor leftBack(8, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor rightFront(11, pros::E_MOTOR_GEARSET_18, false);
 pros::Motor leftFront(20, pros::E_MOTOR_GEARSET_18, true);
 
-pros::Motor intake(1, pros::E_MOTOR_GEARSET_18, false);
+pros::Motor intake(1, pros::E_MOTOR_GEARSET_18, true);
 
 pros::Motor frontGoalLift(13, pros::E_MOTOR_GEARSET_36, false);
 
