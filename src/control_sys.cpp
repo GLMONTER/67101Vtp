@@ -26,7 +26,7 @@ extern bool grabFlag;
 
 bool clawOpened = true;
 bool liftUp = false;
-bool runningSkills = false;
+bool runningSkills = true;
 
 void threadMacro()
 {
@@ -187,7 +187,7 @@ void moveGoalLift()
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
     {
         aFlag = true;
-        claw.move_velocity(40);
+        claw.move_velocity(30);
     }
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
     {

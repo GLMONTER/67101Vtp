@@ -418,38 +418,38 @@ void skills()
     moveToPoint(-48, 4, 1.57, false, 90, 4000);
     clawOpened = false;
     pros::delay(700);
-    clawLift.move_absolute(-4300, 200);
+    clawLift.move_absolute(-4500, 200);
     pros::delay(1500);
     moveToPoint(-27, 3.6, 1.57, true, 90, 4000);
     moveToPoint(-28, 38, 1.57, true, 100, 3000);
     moveToPoint(-30, 38, 4.57, true, 90, 3000);
-    moveToPoint(-19, 38, 4.57, true, 90, 2500);
+    moveToPoint(-20, 34, 4.57, true, 90, 2500);
 
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(1500);
+    pros::delay(1000);
     clawLift.move_absolute(-4500, 200);
     
     moveToPoint(-25, 38, 4.57, true, 90, 2500);
     
-    moveToPoint(-35, 37, 4.57, true, 127, 5000);
+    moveToPoint(-35, 39, 4.57, true, 127, 5000);
     clawLift.move_absolute(-1200, 200);
     //push against middle goal
-    moveToPoint(-70, 37, 4.57, true, 105, 5000);
+    moveToPoint(-70, 39, 4.57, true, 105, 5000);
 
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
     //go get last neutral
-    moveToPoint(-60, 58, 3.14, true, 100, 5000);
-    moveToPoint(-60, 62, 3.14, false, 90, 5000);
+    moveToPoint(-63, 58, 3.14, true, 100, 5000);
+    moveToPoint(-63, 62, 3.14, false, 90, 5000);
 
     clawOpened = false;
     pros::delay(700);
-    clawLift.move_absolute(-4300, 200);
-    pros::delay(1500);
-    moveToPoint(-34, 32, 4.57, true, 100, 5000);
-    moveToPoint(-23, 32, 4.57, true, 100, 5000);
+    clawLift.move_absolute(-4500, 200);
+    pros::delay(1000);
+    moveToPoint(-34, 44, 4.57, true, 100, 5000);
+    moveToPoint(-24, 44, 4.57, true, 100, 5000);
     //lay last neut down
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
@@ -457,13 +457,13 @@ void skills()
     pros::delay(1000);
 
     
-    moveToPoint(-29.5, 70, 3.14, true, 90, 5000);
+    moveToPoint(-35, 70, 3.14, true, 90, 5000);
 
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
 
     //move towards blue alliance
-    moveToPoint(-29.5, 80.7, 3.14, false, 90, 4000);
+    moveToPoint(-35, 92, 3.14, false, 90, 4000);
     //clamp
     clawOpened = false;
 
