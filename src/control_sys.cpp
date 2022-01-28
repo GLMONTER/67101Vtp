@@ -78,7 +78,7 @@ void threadMacro()
                         claw.move(-127);
                     }
                 }
-                if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpened) || (!clawOpened && claw.get_torque() > 1.5))
+                if(((claw.get_position() > -50 && claw.get_position() < 50) && clawOpened) || (!clawOpened && claw.get_torque() > 1.525))
                 {
                     claw.move_velocity(0);
                 }
@@ -87,7 +87,7 @@ void threadMacro()
         //begin lift code
         if(overrideFlag || runningAuton)
         {
-            pros::delay(10);
+            pros::delay(5);
             continue;
         }
         //up toggle

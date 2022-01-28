@@ -420,15 +420,15 @@ void skills()
     pros::delay(700);
     clawLift.move_absolute(-4500, 200);
     pros::delay(1500);
-    moveToPoint(-27, 3.6, 1.57, true, 90, 4000);
-    moveToPoint(-28, 38, 1.57, true, 100, 3000);
-    moveToPoint(-30, 38, 4.57, true, 90, 3000);
-    moveToPoint(-20, 34, 4.57, true, 90, 2500);
+    moveToPoint(-29, 3.6, 1.57, true, 90, 4000);
+    moveToPoint(-29, 38, 1.57, true, 90, 3000);
+    moveToPoint(-30, 38, 4.57, true, 80, 3000);
+    moveToPoint(-20, 34, 4.57, true, 80, 2500);
 
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(1000);
+    pros::delay(750);
     clawLift.move_absolute(-4500, 200);
     
     moveToPoint(-25, 38, 4.57, true, 90, 2500);
@@ -441,48 +441,51 @@ void skills()
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
     //go get last neutral
-    moveToPoint(-63, 58, 3.14, true, 100, 5000);
-    moveToPoint(-63, 62, 3.14, false, 90, 5000);
+    moveToPoint(-61, 60, 3.14, true, 90, 5000);
+    moveToPoint(-61, 65, 3.14, false, 90, 5000);
 
     clawOpened = false;
     pros::delay(700);
-    clawLift.move_absolute(-4500, 200);
+    clawLift.move_absolute(-4600, 200);
     pros::delay(1000);
     moveToPoint(-34, 44, 4.57, true, 100, 5000);
-    moveToPoint(-24, 44, 4.57, true, 100, 5000);
+    moveToPoint(-21, 44, 4.57, true, 100, 5000);
     //lay last neut down
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(1000);
+    pros::delay(500);
+    clawLift.move_absolute(-4500, 200);
+
 
     
-    moveToPoint(-35, 70, 3.14, true, 90, 5000);
+    moveToPoint(-30, 70, 3.14, true, 90, 5000);
 
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
 
     //move towards blue alliance
-    moveToPoint(-35, 92, 3.14, false, 90, 4000);
+    moveToPoint(-30, 92, 3.14, false, 80, 4000);
     //clamp
     clawOpened = false;
 
     pros::delay(700);
-    moveToPoint(-29.5, 75, 3.14, false, 90, 4000);
+    moveToPoint(-29.5, 75, 3.14, false, 80, 4000);
     clawLift.move_absolute(-4300, 200);
     pros::delay(1250);
     //turn towards platform
-    moveToPoint(-29, 75, 1.08, true, 110, 1200);
+    moveToPoint(-29, 75, 1.08, true, 80, 1200);
     //go to platform
-    moveToPoint(-80, 47.63, 1.13, true, 85, 3000);
-    moveToPoint(-82, 47, 3.14, false, 100, 3000);
-    moveToPoint(-85.75, 24, 3.14, true, 100, 3000);
-    moveToPoint(-85.75, 24, 1.57, true, 100, 3000);
+    moveToPoint(-90, 52.63, 1.13, true, 85, 4000);
+    moveToPoint(-92, 52, 3.14, false, 90, 4000);
+    moveToPoint(-95.75, 28, 3.14, true, 90, 4000);
+    moveToPoint(-95.75, 28, 1.5, true, 90, 5000, 0.2, 0.2, 1.0);
     clawLift.move_absolute(-3000, 200);
-    pros::delay(500);
-    clawOpened = true;
-    clawLift.move_absolute(-4300, 200);
     pros::delay(1000);
+    clawOpened = true;
+    pros::delay(1000);
+    clawLift.move_absolute(-4500, 200);
+    pros::delay(10000);
 
 /*
     moveToPoint(-74, 34, 1.57, true, 100, 5000);
@@ -557,7 +560,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    fastElim();
+    skills();
 
 
     runningAuton = false;
