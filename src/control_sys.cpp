@@ -26,7 +26,7 @@ extern bool grabFlag;
 
 bool clawOpened = true;
 bool liftUp = false;
-bool runningSkills = true;
+bool runningSkills = false;
 
 void threadMacro()
 {

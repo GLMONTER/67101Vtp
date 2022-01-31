@@ -318,18 +318,21 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 
 void winPoint()
 {
-    intake.move(-127);
+    intake.move_velocity(150);
     pros::delay(500);
     intake.move(0);
-    moveToPoint(-27, 0, 0, true, 80, 2000);
-    moveToPoint(-28, 89, 0, true, 70, 6000);
-    intake.move(127);
-    pros::delay(1350);
+    moveToPoint(-24, 0, 0, true, 90, 2000);
+    moveToPoint(-25, 89, 0, true, 70, 6000);
+    setDrive(50, 50);
+    pros::delay(500);
+    setDrive(0, 0);
+    intake.move_velocity(100);
+    pros::delay(2000);
     intake.move(0);
     moveToPoint(-31.25, 83, 0, true, 80, 2000);
-    moveToPoint(-45, 89.25, 0, true, 80, 2000);
-    moveToPoint(-44, 98, 0, true, 80, 2000);
-    moveToPoint(-17, 99, 0, true, 80, 2000);
+    moveToPoint(-44, 89.25, 0, true, 80, 2000);
+    moveToPoint(-44, 98, 0, true, 80, 2000, 0.5, 0.5, 1.0);
+    moveToPoint(-17, 99, 0, true, 80, 2000, 0.5, 0.5, 1.0);
 }
 
 void rightElim()
@@ -368,8 +371,11 @@ void rightQuali()
     moveToPoint(0, 23, 1.57, true, 100, 2000);
     moveToPoint(8.5, 35.5, 1.57, true, 100, 2000);
     moveToPoint(15, 27, 2.42, true, 100, 2000);
+    intake.move(-127);
+    pros::delay(750);
+    intake.move(0);
     intake.move(127);
-    pros::delay(1050);
+    pros::delay(2000);
     intake.move(0);
     //moveToPoint(20.5, 28.5, 2.42, true, 100, 2000);
     moveToPoint(21, 9.75, 3, true, 100, 2000);
@@ -391,8 +397,11 @@ void leftQuali()
     frontGoalLift.move_absolute(0, 200);
     moveToPoint(2.25, 12, 2.63, true, 100, 2000);
     moveToPoint(6, 3, 2.81, true, 100, 2000);
+    intake.move(-127);
+    pros::delay(1050);
+    intake.move(0);
     intake.move(127);
-    pros::delay(1000);
+    pros::delay(5000);
     intake.move(0);
 
 
@@ -471,21 +480,22 @@ void skills()
 
     pros::delay(700);
     moveToPoint(-29.5, 75, 3.14, false, 80, 4000);
-    clawLift.move_absolute(-4300, 200);
+    clawLift.move_absolute(-5400, 200);
     pros::delay(1250);
     //turn towards platform
     moveToPoint(-29, 75, 1.08, true, 80, 1200);
     //go to platform
-    moveToPoint(-90, 52.63, 1.13, true, 85, 4000);
-    moveToPoint(-92, 52, 3.14, false, 90, 4000);
-    moveToPoint(-95.75, 28, 3.14, true, 90, 4000);
-    moveToPoint(-95.75, 28, 1.5, true, 90, 5000, 0.2, 0.2, 1.0);
+
+    moveToPoint(-107, 27, 1.57, true, 90, 7000, 0.2, 0.2, 1.0);
     clawLift.move_absolute(-3000, 200);
     pros::delay(1000);
     clawOpened = true;
     pros::delay(1000);
     clawLift.move_absolute(-4500, 200);
-    pros::delay(10000);
+    pros::delay(1000);
+    moveToPoint(-107, 27, 0.0, true, 90, 7000, 0.2, 0.2, 1.0);
+        moveToPoint(-103, 27, 0.0, true, 90, 7000, 0.2, 0.2, 1.0);
+        pros::delay(10000);
 
 /*
     moveToPoint(-74, 34, 1.57, true, 100, 5000);
@@ -539,7 +549,7 @@ void fastElim()
 
     while(grabFlag)
     {
-        if(frontDistance.get() < 300 && frontDistance.get() != 0)
+        if(frontDistance.get() < 295 && frontDistance.get() != 0)
         {
             clawOpened = false;
             grabFlag = false;
@@ -560,7 +570,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    skills();
+    fastElim();
 
 
     runningAuton = false;
