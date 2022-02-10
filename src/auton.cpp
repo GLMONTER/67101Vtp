@@ -63,6 +63,7 @@ typedef struct _pos
 } sPos; // Position of the robot
 
 sPos gPosition;
+
 void setDrive(int32_t left, int32_t right)
 {
     rightFront.move_velocity(right);
@@ -71,7 +72,6 @@ void setDrive(int32_t left, int32_t right)
     leftFront.move_velocity(left);
     leftBack.move_velocity(left);
 }
-
 
 void trackPosition()
 {    
@@ -89,7 +89,8 @@ void trackPosition()
 
     while(true)
     {
-    counter ++;
+        counter ++;
+
         //get encoder position based on a 360 tick rotation
         float left = leftEncoder.get_position();
         float right = rightEncoder.get_position();
@@ -142,6 +143,7 @@ void trackPosition()
         pros::lcd::print(1, "Y : %f", gPosition.y);
         pros::lcd::print(2, "R : %f", gPosition.a);
 
+        //write to terminal
         if(counter > 500)
         {
             std::cout<<"X : "<<gPosition.x<<"   ";
@@ -150,14 +152,12 @@ void trackPosition()
 
             counter = 0;
         }
-
-
         pros::delay(5);
     }
 }
 float getNewPID(const float error, bool resetFlag, const float Pgain = 0.0f, const float iGain = 0.0f, const float dGain = 0.0f)
 {
-   // static float error;
+    // static float error;
     static float integral;
     static float derivative;
     static float previousError;
@@ -230,8 +230,10 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 	while(std::abs(gPosition.x - x) > positionTamper || std::abs(gPosition.y - y) > positionTamper || std::abs(gPosition.a - angle) > angleTamper)
 	{
         i += 10;
+
         if(i > timeout && timeout != 0)
             break;
+
  		//difference in rotation from current rotation to target rotation
         float differenceOfAngle = (angle - gPosition.a);		 
 
@@ -318,23 +320,39 @@ void moveToPoint(const float x, const float y, const float angle, bool goThrough
 
 void winPoint()
 {
-    intake.move_velocity(150);
-    pros::delay(500);
+    intake.move(-127);
+    pros::delay(250);
     intake.move(0);
-    moveToPoint(-24, 0, 0, true, 90, 2000);
-    moveToPoint(-25, 89, 0, true, 70, 6000);
-    setDrive(50, 50);
-    pros::delay(500);
-    setDrive(0, 0);
-    intake.move_velocity(100);
-    pros::delay(2000);
-    intake.move(0);
-    moveToPoint(-31.25, 83, 0, true, 80, 2000);
-    moveToPoint(-44, 89.25, 0, true, 80, 2000);
-    moveToPoint(-44, 98, 0, true, 80, 2000, 0.5, 0.5, 1.0);
-    moveToPoint(-17, 99, 0, true, 80, 2000, 0.5, 0.5, 1.0);
-}
+    moveToPoint(0, 26, 0, true, 100, 3000);
+    moveToPoint(0, 26, 1.57, false, 100, 3000);
 
+    moveToPoint(90, 40, 1.57, true, 80, 4000);
+    moveToPoint(94, 37, 2.8, true, 100, 3000, 15.0, 7.0, 0.05);
+    setDrive(50, 50);
+    pros::delay(1000);
+    setDrive(20, 20);
+    frontGoalLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    frontGoalLift.move(-127);
+    while(!buttonLimit.get_value())
+    {
+        static int i = 0;
+        i++;
+        if(i > 200)
+        {
+            break;
+        }
+        pros::delay(10);
+    }
+    setDrive(0, 0);
+
+    frontGoalLift.move_velocity(0);
+
+    intake.move(127);
+    pros::delay(1500);
+    intake.move(0);
+
+    moveToPoint(90, 10, 3.14, true, 100);
+}
 void rightElim()
 {
     frontGoalLift.move_relative(-3200, 200);
@@ -570,7 +588,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    fastElim();
+    winPoint();
 
 
     runningAuton = false;

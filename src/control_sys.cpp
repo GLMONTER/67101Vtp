@@ -162,6 +162,7 @@ void threadMacro()
 
 void moveGoalLift()
 {
+        std::cout<<frontGoalLift.get_position()<<std::endl;
     //enables or disables the override flag to give the drive different controls.
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
         overrideFlag = true;
