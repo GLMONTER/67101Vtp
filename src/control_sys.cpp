@@ -17,6 +17,10 @@ pros::Motor clawLift(2, pros::E_MOTOR_GEARSET_36, false);
 
 
 pros::ADIDigitalIn buttonLimit('H');
+
+pros::ADIDigitalOut leftPneumatic('A');
+pros::ADIDigitalOut rightPneumatic('B');
+
 //allow macro systems to be overrided
 bool overrideFlag = false;
 //to check if we are running the auton, for use in the multithreaded task
@@ -162,7 +166,6 @@ void threadMacro()
 
 void moveGoalLift()
 {
-        std::cout<<frontGoalLift.get_position()<<std::endl;
     //enables or disables the override flag to give the drive different controls.
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_B) && controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))
         overrideFlag = true;
@@ -183,8 +186,10 @@ void moveGoalLift()
     {
         frontGoalLift.move_velocity(0);
     }
+
     static bool clawOpenManual = true;
     static bool aFlag = false;
+
     if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
     {
         aFlag = true;
@@ -208,14 +213,12 @@ void moveGoalLift()
             claw.move(-127);
         if(claw.get_position() < -50)
             claw.move(127);
-        pros::lcd::print(5, "%s", "open");
         }
     }
     if(!clawOpenManual && !aFlag)
     {
         if(claw.get_torque() < 1.5)
         {
-            pros::lcd::print(5, "%f", claw.get_position());
             claw.move(-127);
         }
     }

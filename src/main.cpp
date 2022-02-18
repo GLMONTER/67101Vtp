@@ -390,12 +390,9 @@ void christmas()
         fLight.set_value(HIGH);
         gLight.set_value(HIGH);
 
-
-
         pros::delay(100);
         cLight.set_value(LOW);
-        
-
+    
         pros::delay(100);
         dLight.set_value(LOW);
         cLight.set_value(HIGH);
@@ -471,6 +468,17 @@ void opcontrol()
             intake.move(-127);
         else
             intake.move(0);
+
+        if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_A) && slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
+        {
+            leftPneumatic.set_value(LOW);
+            rightPneumatic.set_value(LOW);
+        }
+        if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_Y) && slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
+        {
+            leftPneumatic.set_value(HIGH);
+            rightPneumatic.set_value(HIGH);
+        }
         
         moveGoalLift();
         pros::delay(10);

@@ -17,3 +17,5 @@ extern pros::Motor frontGoalLift;
 extern pros::Motor claw;
 extern pros::Motor clawLift;
 
+extern pros::ADIDigitalOut leftPneumatic;
+extern pros::ADIDigitalOut rightPneumatic;
