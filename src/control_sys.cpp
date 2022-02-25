@@ -30,7 +30,7 @@ extern bool grabFlag;
 
 bool clawOpened = true;
 bool liftUp = false;
-bool runningSkills = false;
+bool runningSkills = true;
 
 void threadMacro()
 {

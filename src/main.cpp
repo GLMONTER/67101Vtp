@@ -428,6 +428,9 @@ void initialize()
    // pros::Task distanceTask(distanceGrab, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "distanceGrab");
 
     claw.tare_position();
+
+    leftPneumatic.set_value(HIGH);
+    rightPneumatic.set_value(HIGH);
 }
 
 void disabled() {}
@@ -462,23 +465,40 @@ void opcontrol()
         rightBack.move(Ch3 - Ch1 + Ch4);
         
         //slave controller code to control intake
-        if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
+        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
             intake.move(127);
-        else if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+        else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
             intake.move(-127);
         else
             intake.move(0);
-
-        if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_A) && slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))
+        if(slaveController.is_connected())
         {
-            leftPneumatic.set_value(LOW);
-            rightPneumatic.set_value(LOW);
+            if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_R2))
+            {
+                leftPneumatic.set_value(LOW);
+                rightPneumatic.set_value(LOW);
+            }
+            if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+            {
+                leftPneumatic.set_value(HIGH);
+                rightPneumatic.set_value(HIGH);
+            }
         }
-        if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_Y) && slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))
+        /*
+        if(!slaveController.is_connected())
         {
-            leftPneumatic.set_value(HIGH);
-            rightPneumatic.set_value(HIGH);
+            if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+            {
+                leftPneumatic.set_value(LOW);
+                rightPneumatic.set_value(LOW);
+            }
+            if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
+            {
+                leftPneumatic.set_value(HIGH);
+                rightPneumatic.set_value(HIGH);
+            }
         }
+        */
         
         moveGoalLift();
         pros::delay(10);

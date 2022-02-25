@@ -326,13 +326,15 @@ void winPoint()
     moveToPoint(0, 26, 0, true, 100, 3000);
     moveToPoint(0, 26, 1.57, false, 100, 3000);
 
-    moveToPoint(90, 40, 1.57, true, 80, 4000);
-    moveToPoint(94, 37, 2.8, true, 100, 3000, 15.0, 7.0, 0.05);
-    setDrive(50, 50);
-    pros::delay(1000);
-    setDrive(20, 20);
+    moveToPoint(83, 26.75, 1.77, true, 80, 4000);
+
+    setDrive(40, 40);
+    pros::delay(1400);
+    setDrive(10, 10);
     frontGoalLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     frontGoalLift.move(-127);
+    pros::delay(1000);
+        setDrive(-20, -20);
     while(!buttonLimit.get_value())
     {
         static int i = 0;
@@ -343,15 +345,19 @@ void winPoint()
         }
         pros::delay(10);
     }
-    setDrive(0, 0);
 
     frontGoalLift.move_velocity(0);
 
     intake.move(127);
     pros::delay(1500);
     intake.move(0);
+    setDrive(0, 0);
+    moveToPoint(65, 23.16, 1.77, true, 80, 4000);
+    frontGoalLift.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    frontGoalLift.move_velocity(0);
 
-    moveToPoint(90, 10, 3.14, true, 100);
+
+
 }
 void rightElim()
 {
@@ -444,7 +450,7 @@ void skills()
    
     moveToPoint(-48, 4, 1.57, false, 90, 4000);
     clawOpened = false;
-    pros::delay(700);
+    pros::delay(850);
     clawLift.move_absolute(-4500, 200);
     pros::delay(1500);
     moveToPoint(-29, 3.6, 1.57, true, 90, 4000);
@@ -468,11 +474,11 @@ void skills()
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
     //go get last neutral
-    moveToPoint(-61, 60, 3.14, true, 90, 5000);
-    moveToPoint(-61, 65, 3.14, false, 90, 5000);
+    moveToPoint(-58.5, 60, 3.14, true, 90, 5000);
+    moveToPoint(-58.5, 65, 3.14, false, 90, 5000);
 
     clawOpened = false;
-    pros::delay(700);
+    pros::delay(1200);
     clawLift.move_absolute(-4600, 200);
     pros::delay(1000);
     moveToPoint(-34, 44, 4.57, true, 100, 5000);
@@ -492,7 +498,7 @@ void skills()
     clawOpened = true;
 
     //move towards blue alliance
-    moveToPoint(-30, 92, 3.14, false, 80, 4000);
+    moveToPoint(-28, 92, 3.14, false, 80, 4000);
     //clamp
     clawOpened = false;
 
@@ -508,33 +514,28 @@ void skills()
     clawLift.move_absolute(-3000, 200);
     pros::delay(1000);
     clawOpened = true;
-    pros::delay(1000);
+    pros::delay(500);
     clawLift.move_absolute(-4500, 200);
+    intake.move_absolute(0, 200);
     pros::delay(1000);
-    moveToPoint(-107, 27, 0.0, true, 90, 7000, 0.2, 0.2, 1.0);
-        moveToPoint(-103, 27, 0.0, true, 90, 7000, 0.2, 0.2, 1.0);
-        pros::delay(10000);
+    moveToPoint(-98, 27, 1.57, true, 90, 3000, 0.2, 0.2, 1.0);
 
-/*
-    moveToPoint(-74, 34, 1.57, true, 100, 5000);
+    moveToPoint(-98, 27, -1.57, true, 90, 3000, 0.2, 0.2, 1.0);
     clawLift.move_absolute(-1200, 200);
-    moveToPoint(-80, 34, 1.57, true, 100, 5000);
-    moveToPoint(-80, 34, 4.71, true, 100, 5000);
-    moveToPoint(-75, 34, 4.71, true, 100, 5000);
-    //grab rear goal
+    pros::delay(750);
     clawOpened = false;
-    pros::delay(500);
-    clawLift.move_absolute(-4300, 200);
-    pros::delay(1000);
-    moveToPoint(-85.75, 34, 1.57, true, 100, 5000);
+    pros::delay(750);
+    clawLift.move_absolute(-4500, 200);
+
+    moveToPoint(-98, 27, 1.57, true, 90, 3000, 0.2, 0.2, 1.0);
+    moveToPoint(-107, 27, 1.57, true, 90, 3000, 0.2, 0.2, 1.0);
+
     clawLift.move_absolute(-3000, 200);
-    pros::delay(500);
+    pros::delay(750);
     clawOpened = true;
-    pros::delay(500);
-    clawLift.move_absolute(-4300, 200);
-    moveToPoint(-78, 34, 1.57, true, 100, 5000);
-    pros::delay(5000);
-    */
+    clawLift.move_absolute(-5500, 200);
+    pros::delay(10000);
+
 }
 void leftElim()
 {
@@ -567,7 +568,7 @@ void fastElim()
 
     while(grabFlag)
     {
-        if(frontDistance.get() < 295 && frontDistance.get() != 0)
+        if(frontDistance.get() < 280 && frontDistance.get() != 0)
         {
             clawOpened = false;
             grabFlag = false;
@@ -588,7 +589,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    winPoint();
+    skills();
 
 
     runningAuton = false;
