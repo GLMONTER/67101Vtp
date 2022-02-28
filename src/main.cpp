@@ -2,7 +2,7 @@
 //for std::setpercision
 #include <iomanip>
 
-#define TESTING
+//#define TESTING
 
 extern void trackPosition();
 extern void threadMacro();
@@ -465,9 +465,9 @@ void opcontrol()
         rightBack.move(Ch3 - Ch1 + Ch4);
         
         //slave controller code to control intake
-        if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+        if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
             intake.move(127);
-        else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))
+        else if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
             intake.move(-127);
         else
             intake.move(0);

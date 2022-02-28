@@ -515,9 +515,12 @@ void skills()
     pros::delay(1000);
     clawOpened = true;
     pros::delay(500);
-    clawLift.move_absolute(-4500, 200);
-    intake.move_absolute(0, 200);
+    clawLift.move_absolute(-5500, 200);
+    frontGoalLift.move_absolute(0, 200);
     pros::delay(1000);
+    clawOpened = false;
+        moveToPoint(-101, 27, 0.0, true, 90, 3000, 0.2, 0.2, 1.0);
+    /*
     moveToPoint(-98, 27, 1.57, true, 90, 3000, 0.2, 0.2, 1.0);
 
     moveToPoint(-98, 27, -1.57, true, 90, 3000, 0.2, 0.2, 1.0);
@@ -535,7 +538,7 @@ void skills()
     clawOpened = true;
     clawLift.move_absolute(-5500, 200);
     pros::delay(10000);
-
+*/
 }
 void leftElim()
 {
@@ -561,14 +564,14 @@ void fastElim()
 {
     grabFlag = true;
     clawLift.move_absolute(-1200, 200);
-    claw.move_absolute(-600, 200);
+    claw.move_absolute(-400, 200);
 
     pros::lcd::print(6, "%d", grabFlag);
-    setDrive(-200, -200);
+    setDrive(-150, -150);
 
     while(grabFlag)
     {
-        if(frontDistance.get() < 280 && frontDistance.get() != 0)
+        if(frontDistance.get() < 200 && frontDistance.get() != 0)
         {
             clawOpened = false;
             grabFlag = false;
@@ -589,7 +592,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    skills();
+    fastElim();
 
 
     runningAuton = false;
