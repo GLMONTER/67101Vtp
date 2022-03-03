@@ -3,7 +3,7 @@
 bool runningAuton = false;
 extern bool clawOpened;
 extern bool liftUp;
-
+extern bool actuatePNflag;
 //related to distance sensor
 bool grabFlag = false;
 
@@ -66,6 +66,11 @@ sPos gPosition;
 
 void setDrive(int32_t left, int32_t right)
 {
+    rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+
     rightFront.move_velocity(right);
     rightBack.move_velocity(right);
 
@@ -430,7 +435,152 @@ void leftQuali()
 
 
 }
+void skillsPark()
+{
+    /*
 
+    //lift up counter weight
+    liftUp = true;
+    while(!buttonLimit.get_value())
+    {
+        pros::delay(5);
+    }
+    intake.move(127);
+    //drive away from platform
+    moveToPoint(0, -4.8, 0, true, 90, 4000);
+    //turn towards first goal
+     clawLift.move_absolute(-1200, 200);
+    moveToPoint(-18.5, 4, 1.57, true, 90, 4000);
+    intake.move(0);
+
+    moveToPoint(-48, 4, 1.57, false, 90, 4000);
+    clawOpened = false;
+    pros::delay(850);
+    clawLift.move_absolute(-4500, 200);
+    pros::delay(1500);
+    moveToPoint(-29, 3.6, 1.57, true, 90, 4000);
+    moveToPoint(-29, 38, 1.57, true, 90, 3000);
+    moveToPoint(-30, 38, 4.57, true, 80, 3000);
+    moveToPoint(-20, 34, 4.57, true, 80, 2500);
+
+    clawLift.move_absolute(-3400, 200);
+    pros::delay(500);
+    clawOpened = true;
+    pros::delay(750);
+    clawLift.move_absolute(-4500, 200);
+
+    moveToPoint(-25, 38, 4.57, true, 90, 2500);
+
+    moveToPoint(-35, 39, 4.57, true, 127, 5000);
+    clawLift.move_absolute(-1200, 200);
+    //push against middle goal
+    moveToPoint(-70, 39, 4.57, true, 105, 5000);
+
+    clawLift.move_absolute(-1200, 200);
+    clawOpened = true;
+    //go get last neutral
+    moveToPoint(-58.5, 60, 3.14, true, 90, 5000);
+    moveToPoint(-58.5, 65, 3.14, false, 90, 5000);
+
+    clawOpened = false;
+    pros::delay(1200);
+    clawLift.move_absolute(-4600, 200);
+    pros::delay(1000);
+    moveToPoint(-34, 44, 4.57, true, 100, 5000);
+    moveToPoint(-21, 44, 4.57, true, 100, 5000);
+    //lay last neut down
+    clawLift.move_absolute(-3400, 200);
+    pros::delay(500);
+    clawOpened = true;
+    pros::delay(500);
+    clawLift.move_absolute(-4500, 200);
+
+
+
+    moveToPoint(-30, 70, 3.14, true, 90, 5000);
+
+    clawLift.move_absolute(-1200, 200);
+    clawOpened = true;
+
+    //move towards blue alliance
+    moveToPoint(-28, 92, 3.14, false, 80, 4000);
+    //clamp
+    clawOpened = false;
+
+    pros::delay(700);
+    moveToPoint(-29.5, 75, 3.14, false, 80, 4000);
+    clawLift.move_absolute(-5400, 200);
+    pros::delay(1250);
+    //turn towards platform
+    moveToPoint(-29, 75, 1.08, true, 80, 1200);
+    //go to platform
+    /*
+    moveToPoint(-107, 27, 1.57, true, 90, 7000, 0.2, 0.2, 1.0);
+    clawLift.move_absolute(-3000, 200);
+    pros::delay(1000);
+    clawOpened = true;
+    pros::delay(500);
+    clawLift.move_absolute(-5500, 200);
+    frontGoalLift.move_absolute(0, 200);
+    pros::delay(1000);
+    clawOpened = false;
+        moveToPoint(-101, 27, 0.0, true, 90, 3000, 0.2, 0.2, 1.0);
+*/
+
+    //lift up counter weight
+    liftUp = true;
+    while(!buttonLimit.get_value())
+    {
+        pros::delay(5);
+    }
+    clawLift.move_absolute(-1200, 200);
+    pros::delay(750);
+    clawOpened = false;
+    pros::delay(750);
+    clawLift.move_absolute(-6000, 200);
+    pros::delay(2000);
+    setDrive(-30, -30);
+    pros::delay(2500);
+    setDrive(30, 30);
+    pros::delay(500);
+    clawLift.move_absolute(-1400, 200);
+    pros::delay(1000);
+    setDrive(-100, -100);
+    pros::delay(750);
+    clawLift.move_absolute(-1800, 200);
+
+    while(gyro.get_pitch() > 19)
+    {
+        setDrive(-150, -150);
+        pros::delay(10);
+    }
+    pros::delay(400);
+    while(true)
+    {
+        if(gyro.get_pitch() < 45 && gyro.get_pitch() > 32)
+        {
+            setDrive(0,0);
+            actuatePNflag = false;
+            continue;
+        }
+        if(gyro.get_pitch() < 32)
+        {
+            setDrive(-150,-150);
+            actuatePNflag = true;
+
+        }
+        if(gyro.get_pitch() > 42)
+        {
+            setDrive(21,21);
+            actuatePNflag = false;
+        }
+        pros::delay(10);
+
+    }
+
+
+
+}
 void skills()
 {
 
@@ -592,7 +742,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    fastElim();
+    skillsPark();
 
 
     runningAuton = false;

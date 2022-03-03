@@ -2,7 +2,7 @@
 //for std::setpercision
 #include <iomanip>
 
-//#define TESTING
+#define TESTING
 
 extern void trackPosition();
 extern void threadMacro();
@@ -11,6 +11,31 @@ extern void distanceGrab();
 extern pros::Rotation leftEncoder;
 extern pros::Rotation middleEncoder;
 extern pros::Rotation rightEncoder;
+
+bool actuatePNflag = false;
+
+void actuatePN()
+{
+    while(true)
+    {
+        if(actuatePNflag)
+        {
+
+                pros::delay(500);
+                leftPneumatic.set_value(LOW);
+                rightPneumatic.set_value(LOW);
+                pros::delay(1500);
+                leftPneumatic.set_value(HIGH);
+                rightPneumatic.set_value(HIGH);
+                pros::delay(750);
+                leftPneumatic.set_value(LOW);
+                rightPneumatic.set_value(LOW);
+
+        }
+        pros::delay(10);
+    }
+
+}
 
 typedef struct _pos
 {
@@ -417,6 +442,7 @@ void initialize()
 {
 	pros::Task trackingTask(trackPosition, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "Tracking Task");
     pros::Task macroTask(threadMacro, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "Macro Task");
+    pros::Task pnTask(actuatePN, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "PN Task");
     #ifndef TESTING
     pros::Task draw(drawUI, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "UI Task");
     #else
@@ -431,6 +457,9 @@ void initialize()
 
     leftPneumatic.set_value(HIGH);
     rightPneumatic.set_value(HIGH);
+    gyro.reset();
+    pros::delay(5000);
+
 }
 
 void disabled() {}

@@ -19,3 +19,4 @@ extern pros::Motor clawLift;
 
 extern pros::ADIDigitalOut leftPneumatic;
 extern pros::ADIDigitalOut rightPneumatic;
+extern pros::IMU gyro;

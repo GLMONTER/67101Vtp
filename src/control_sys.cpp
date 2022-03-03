@@ -21,6 +21,8 @@ pros::ADIDigitalIn buttonLimit('H');
 pros::ADIDigitalOut leftPneumatic('A');
 pros::ADIDigitalOut rightPneumatic('B');
 
+pros::IMU gyro(12);
+
 //allow macro systems to be overrided
 bool overrideFlag = false;
 //to check if we are running the auton, for use in the multithreaded task
