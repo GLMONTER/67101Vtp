@@ -437,7 +437,7 @@ void leftQuali()
 }
 void skillsPark()
 {
-    /*
+
 
     //lift up counter weight
     liftUp = true;
@@ -455,18 +455,18 @@ void skillsPark()
 
     moveToPoint(-48, 4, 1.57, false, 90, 4000);
     clawOpened = false;
-    pros::delay(850);
-    clawLift.move_absolute(-4500, 200);
+    pros::delay(750);
+    clawLift.move_absolute(-5000, 200);
     pros::delay(1500);
     moveToPoint(-29, 3.6, 1.57, true, 90, 4000);
-    moveToPoint(-29, 38, 1.57, true, 90, 3000);
-    moveToPoint(-30, 38, 4.57, true, 80, 3000);
+    moveToPoint(-29, 38, 1.57, true, 100, 3000);
+    moveToPoint(-30, 38, 4.57, true, 90, 2500);
     moveToPoint(-20, 34, 4.57, true, 80, 2500);
 
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(750);
+    pros::delay(500);
     clawLift.move_absolute(-4500, 200);
 
     moveToPoint(-25, 38, 4.57, true, 90, 2500);
@@ -479,75 +479,59 @@ void skillsPark()
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
     //go get last neutral
-    moveToPoint(-58.5, 60, 3.14, true, 90, 5000);
-    moveToPoint(-58.5, 65, 3.14, false, 90, 5000);
+    moveToPoint(-57.5, 60, 3.14, true, 90, 5000);
+    moveToPoint(-57.5, 64, 3.14, false, 90, 5000);
 
     clawOpened = false;
     pros::delay(1200);
-    clawLift.move_absolute(-4600, 200);
+    clawLift.move_absolute(-5200, 200);
     pros::delay(1000);
-    moveToPoint(-34, 44, 4.57, true, 100, 5000);
-    moveToPoint(-21, 44, 4.57, true, 100, 5000);
+    moveToPoint(-34, 44, 4.57, true, 100, 4000);
+    moveToPoint(-21.5, 44, 4.57, true, 100, 3000);
     //lay last neut down
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(500);
+    pros::delay(250);
     clawLift.move_absolute(-4500, 200);
 
 
 
-    moveToPoint(-30, 70, 3.14, true, 90, 5000);
+    moveToPoint(-24, 70, 3.14, true, 90, 5000);
 
-    clawLift.move_absolute(-1200, 200);
+    clawLift.move_absolute(-1000, 200);
     clawOpened = true;
 
     //move towards blue alliance
-    moveToPoint(-28, 92, 3.14, false, 80, 4000);
+    moveToPoint(-24, 92, 3.14, false, 80, 4000);
     //clamp
     clawOpened = false;
 
     pros::delay(700);
-    moveToPoint(-29.5, 75, 3.14, false, 80, 4000);
-    clawLift.move_absolute(-5400, 200);
-    pros::delay(1250);
-    //turn towards platform
-    moveToPoint(-29, 75, 1.08, true, 80, 1200);
-    //go to platform
-    /*
-    moveToPoint(-107, 27, 1.57, true, 90, 7000, 0.2, 0.2, 1.0);
-    clawLift.move_absolute(-3000, 200);
-    pros::delay(1000);
-    clawOpened = true;
-    pros::delay(500);
-    clawLift.move_absolute(-5500, 200);
-    frontGoalLift.move_absolute(0, 200);
-    pros::delay(1000);
-    clawOpened = false;
-        moveToPoint(-101, 27, 0.0, true, 90, 3000, 0.2, 0.2, 1.0);
-*/
+    clawLift.move_absolute(-5600, 200);
+    pros::delay(250);
+    moveToPoint(-24, 75, 3.14, false, 80, 4000);
 
-    //lift up counter weight
-    liftUp = true;
-    while(!buttonLimit.get_value())
-    {
-        pros::delay(5);
-    }
-    clawLift.move_absolute(-1200, 200);
-    pros::delay(750);
-    clawOpened = false;
-    pros::delay(750);
-    clawLift.move_absolute(-6000, 200);
+    pros::delay(1600);
+    //turn towards platform
+    moveToPoint(-25.5, 75, 0.8, true, 80, 1200);
+    //go to platform
+    moveToPoint(-126, -5.25, 0.8, true, 100, 5000);
+    moveToPoint(-126, -5.25, 3.14, true, 100, 2000);
+
+
+    clawLift.move_absolute(-6500, 200);
     pros::delay(2000);
-    setDrive(-30, -30);
-    pros::delay(2500);
-    setDrive(30, 30);
-    pros::delay(500);
+
+    setDrive(-50, -50);
+    pros::delay(1500);
+    setDrive(50, 50);
+    pros::delay(800);
     clawLift.move_absolute(-1400, 200);
     pros::delay(1000);
     setDrive(-100, -100);
     pros::delay(750);
-    clawLift.move_absolute(-1800, 200);
+    clawLift.move_absolute(-2200, 200);
 
     while(gyro.get_pitch() > 19)
     {
@@ -575,11 +559,7 @@ void skillsPark()
             actuatePNflag = false;
         }
         pros::delay(10);
-
     }
-
-
-
 }
 void skills()
 {
