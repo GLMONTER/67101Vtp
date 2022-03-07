@@ -328,41 +328,18 @@ void winPoint()
     intake.move(-127);
     pros::delay(250);
     intake.move(0);
-    moveToPoint(0, 26, 0, true, 100, 3000);
-    moveToPoint(0, 26, 1.57, false, 100, 3000);
+    moveToPoint(0, 24, 0, true, 80, 3000);
+    moveToPoint(0, 24, 1.57, false, 100, 3000);
+    moveToPoint(75, 24, 1.57, true, 80, 4000);
 
-    moveToPoint(83, 26.75, 1.77, true, 80, 4000);
-
-    setDrive(40, 40);
-    pros::delay(1400);
-    setDrive(10, 10);
-    frontGoalLift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    frontGoalLift.move(-127);
-    pros::delay(1000);
-        setDrive(-20, -20);
-    while(!buttonLimit.get_value())
-    {
-        static int i = 0;
-        i++;
-        if(i > 200)
-        {
-            break;
-        }
-        pros::delay(10);
-    }
-
-    frontGoalLift.move_velocity(0);
+    moveToPoint(94, 29, 2.68, true, 80, 4000);
 
     intake.move(127);
-    pros::delay(1500);
+    pros::delay(2500);
     intake.move(0);
-    setDrive(0, 0);
-    moveToPoint(65, 23.16, 1.77, true, 80, 4000);
-    frontGoalLift.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    frontGoalLift.move_velocity(0);
-
-
-
+    setDrive(150, 150);
+    pros::delay(4000);
+    setDrive(0,0);
 }
 void rightElim()
 {
@@ -403,8 +380,8 @@ void rightQuali()
     intake.move(-127);
     pros::delay(750);
     intake.move(0);
-    intake.move(127);
-    pros::delay(2000);
+    intake.move(1000);
+    pros::delay(2500);
     intake.move(0);
     //moveToPoint(20.5, 28.5, 2.42, true, 100, 2000);
     moveToPoint(21, 9.75, 3, true, 100, 2000);
@@ -425,13 +402,12 @@ void leftQuali()
     moveToPoint(8, 13, 1.57, true, 100, 2000);
     frontGoalLift.move_absolute(0, 200);
     moveToPoint(2.25, 12, 2.63, true, 100, 2000);
-    moveToPoint(6, 3, 2.81, true, 100, 2000);
+    moveToPoint(7, 4, 2.81, true, 100, 2000);
     intake.move(-127);
-    pros::delay(1050);
+    pros::delay(750);
     intake.move(0);
     intake.move(127);
-    pros::delay(5000);
-    intake.move(0);
+    pros::delay(10000);
 
 
 }
@@ -564,7 +540,7 @@ void skillsPark()
 void skills()
 {
 
-    //lift up counter weight
+   //lift up counter weight
     liftUp = true;
     while(!buttonLimit.get_value())
     {
@@ -577,25 +553,25 @@ void skills()
      clawLift.move_absolute(-1200, 200);
     moveToPoint(-18.5, 4, 1.57, true, 90, 4000);
     intake.move(0);
-   
+
     moveToPoint(-48, 4, 1.57, false, 90, 4000);
     clawOpened = false;
-    pros::delay(850);
-    clawLift.move_absolute(-4500, 200);
+    pros::delay(750);
+    clawLift.move_absolute(-5000, 200);
     pros::delay(1500);
     moveToPoint(-29, 3.6, 1.57, true, 90, 4000);
-    moveToPoint(-29, 38, 1.57, true, 90, 3000);
-    moveToPoint(-30, 38, 4.57, true, 80, 3000);
+    moveToPoint(-29, 38, 1.57, true, 100, 3000);
+    moveToPoint(-30, 38, 4.57, true, 90, 2500);
     moveToPoint(-20, 34, 4.57, true, 80, 2500);
 
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(750);
+    pros::delay(500);
     clawLift.move_absolute(-4500, 200);
-    
+
     moveToPoint(-25, 38, 4.57, true, 90, 2500);
-    
+
     moveToPoint(-35, 39, 4.57, true, 127, 5000);
     clawLift.move_absolute(-1200, 200);
     //push against middle goal
@@ -604,40 +580,40 @@ void skills()
     clawLift.move_absolute(-1200, 200);
     clawOpened = true;
     //go get last neutral
-    moveToPoint(-58.5, 60, 3.14, true, 90, 5000);
-    moveToPoint(-58.5, 65, 3.14, false, 90, 5000);
+    moveToPoint(-57.5, 60, 3.14, true, 90, 5000);
+    moveToPoint(-57.5, 64, 3.14, false, 90, 5000);
 
     clawOpened = false;
     pros::delay(1200);
-    clawLift.move_absolute(-4600, 200);
+    clawLift.move_absolute(-5200, 200);
     pros::delay(1000);
-    moveToPoint(-34, 44, 4.57, true, 100, 5000);
-    moveToPoint(-21, 44, 4.57, true, 100, 5000);
+    moveToPoint(-34, 44, 4.57, true, 100, 4000);
+    moveToPoint(-21.5, 44, 4.57, true, 100, 3000);
     //lay last neut down
     clawLift.move_absolute(-3400, 200);
     pros::delay(500);
     clawOpened = true;
-    pros::delay(500);
+    pros::delay(250);
     clawLift.move_absolute(-4500, 200);
 
 
-    
-    moveToPoint(-30, 70, 3.14, true, 90, 5000);
 
-    clawLift.move_absolute(-1200, 200);
+    moveToPoint(-24, 70, 3.14, true, 90, 5000);
+
+    clawLift.move_absolute(-1000, 200);
     clawOpened = true;
 
     //move towards blue alliance
-    moveToPoint(-28, 92, 3.14, false, 80, 4000);
+    moveToPoint(-24, 92, 3.14, false, 80, 4000);
     //clamp
     clawOpened = false;
 
     pros::delay(700);
-    moveToPoint(-29.5, 75, 3.14, false, 80, 4000);
+    moveToPoint(-25.5, 75, 3.14, false, 80, 4000);
     clawLift.move_absolute(-5400, 200);
     pros::delay(1250);
     //turn towards platform
-    moveToPoint(-29, 75, 1.08, true, 80, 1200);
+    moveToPoint(-25, 75, 1.08, true, 80, 1200);
     //go to platform
 
     moveToPoint(-107, 27, 1.57, true, 90, 7000, 0.2, 0.2, 1.0);
@@ -696,12 +672,11 @@ void fastElim()
     clawLift.move_absolute(-1200, 200);
     claw.move_absolute(-400, 200);
 
-    pros::lcd::print(6, "%d", grabFlag);
-    setDrive(-150, -150);
+    setDrive(-200, -200);
 
     while(grabFlag)
     {
-        if(frontDistance.get() < 200 && frontDistance.get() != 0)
+        if(frontDistance.get() < 300 && frontDistance.get() != 0)
         {
             clawOpened = false;
             grabFlag = false;
@@ -722,7 +697,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    skillsPark();
+    fastElim();
 
 
     runningAuton = false;

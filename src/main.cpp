@@ -2,7 +2,7 @@
 //for std::setpercision
 #include <iomanip>
 
-#define TESTING
+//#define TESTING
 
 extern void trackPosition();
 extern void threadMacro();
@@ -13,6 +13,8 @@ extern pros::Rotation middleEncoder;
 extern pros::Rotation rightEncoder;
 
 bool actuatePNflag = false;
+
+extern bool runningSkills;
 
 void actuatePN()
 {
@@ -442,7 +444,10 @@ void initialize()
 {
 	pros::Task trackingTask(trackPosition, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "Tracking Task");
     pros::Task macroTask(threadMacro, TASK_PRIORITY_MAX, TASK_STACK_DEPTH_DEFAULT, "Macro Task");
-    pros::Task pnTask(actuatePN, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "PN Task");
+    if(runningSkills)
+    {
+        pros::Task pnTask(actuatePN, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "PN Task");
+    }
     #ifndef TESTING
     pros::Task draw(drawUI, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, "UI Task");
     #else
@@ -455,10 +460,14 @@ void initialize()
 
     claw.tare_position();
 
+    
     leftPneumatic.set_value(HIGH);
     rightPneumatic.set_value(HIGH);
-    gyro.reset();
-    pros::delay(5000);
+    if(runningSkills)
+    {
+        gyro.reset();
+        pros::delay(5000);
+    }
 
 }
 
