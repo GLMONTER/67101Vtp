@@ -362,12 +362,22 @@ void rightElim()
 }
 void rightQuali()
 {
+
     frontGoalLift.move_relative(-3200, 200);
 
-    moveToPoint(0, 42, 0, true, 80, 2000);
+    while(frontDistance.get() < 1350)
+    {
+        setDrive(200, 200);
+    }
+
+    //lock drive
+    leftFront.move_velocity(0);
+    leftBack.move_velocity(0);
+    rightFront.move_velocity(0);
+    rightBack.move_velocity(0);
 
     frontGoalLift.move_relative(1000, 200);
-    pros::delay(600);
+    pros::delay(400);
     moveToPoint(0, 23, 0, true, 100);
     moveToPoint(0, 23, -1.57, true, 127, 1300);
     frontGoalLift.move_relative(-1000, 200);
@@ -697,7 +707,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    fastElim();
+    rightQuali();
 
 
     runningAuton = false;
