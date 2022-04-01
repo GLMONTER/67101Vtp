@@ -87,7 +87,7 @@ void trackPosition()
     rightEncoder.reset_position();
     middleEncoder.reset_position();
 
-    //update encoders every 5 miliseconds
+    //update encoders every 5 milliseconds
     leftEncoder.set_data_rate(5);
     rightEncoder.set_data_rate(5);
     middleEncoder.set_data_rate(5);
@@ -381,43 +381,41 @@ void rightQuali()
     moveToPoint(0, 23, 0, true, 100);
     moveToPoint(0, 23, -1.57, true, 127, 1300);
     frontGoalLift.move_relative(-1000, 200);
-    moveToPoint(-6, 23, -1.57, true, 110, 2000);
-    frontGoalLift.move_relative(3200, 200);
-    moveToPoint(0, 23, -1.57, true, 100, 2000);
-    moveToPoint(0, 23, 1.57, true, 100, 2000);
-    moveToPoint(8.5, 35.5, 1.57, true, 100, 2000);
-    moveToPoint(15, 27, 2.42, true, 100, 2000);
+    moveToPoint(22, 38, -1.57, true, 100, 2000);
+    moveToPoint(22, 38, 1.57, true, 100, 2000);
+    moveToPoint(22, 25, 1.57, true, 127, 2000);
     intake.move(-127);
-    pros::delay(750);
+    pros::delay(250);
     intake.move(0);
-    intake.move(1000);
-    pros::delay(2500);
-    intake.move(0);
-    //moveToPoint(20.5, 28.5, 2.42, true, 100, 2000);
-    moveToPoint(21, 9.75, 3, true, 100, 2000);
+    moveToPoint(22, 10, 1.57, true, 127, 2000);
+        moveToPoint(22, 10, 3.14, true, 127, 2000);
+    frontGoalLift.move_relative(3200, 200);
+
 
 
 }
 void leftQuali()
 {
-    frontGoalLift.move_relative(-3200, 200);
-    moveToPoint(8, 18, 0, true, 127, 2000);
-    moveToPoint(8, 41, 0, true, 127, 2000);
-    frontGoalLift.move_relative(1000, 200);
-    pros::delay(600);
-    moveToPoint(6.25, 15, 0, true, 100, 2000);
-    moveToPoint(8, 13, 1.57, true, 100, 2000);
-    frontGoalLift.move_relative(-2200, 200);
-    moveToPoint(14, 13, 1.57, true, 100, 2000);
-    moveToPoint(8, 13, 1.57, true, 100, 2000);
-    frontGoalLift.move_absolute(0, 200);
-    moveToPoint(2.25, 12, 2.63, true, 100, 2000);
-    moveToPoint(7, 4, 2.81, true, 100, 2000);
     intake.move(-127);
-    pros::delay(750);
+    pros::delay(250);
     intake.move(0);
-    intake.move(127);
-    pros::delay(10000);
+    frontGoalLift.move_relative(-3200, 200);
+
+    while(frontDistance.get() < 1350)
+    {
+        setDrive(200, 200);
+    }
+
+    //lock drive
+    leftFront.move_velocity(0);
+    leftBack.move_velocity(0);
+    rightFront.move_velocity(0);
+    rightBack.move_velocity(0);
+
+    frontGoalLift.move_relative(1000, 200);
+    pros::delay(400);
+    moveToPoint(0,0,0, true);
+
 
 
 }
@@ -707,7 +705,7 @@ void runAuton()
     runningAuton = true;
     init();
 
-    rightQuali();
+    leftQuali();
 
 
     runningAuton = false;
