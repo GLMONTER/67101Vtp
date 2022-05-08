@@ -397,7 +397,7 @@ void rightQuali()
 void leftQuali()
 {
     intake.move(-127);
-    pros::delay(250);
+    pros::delay(500);
     intake.move(0);
     frontGoalLift.move_relative(-3200, 200);
 
@@ -421,8 +421,6 @@ void leftQuali()
 }
 void skillsPark()
 {
-
-
     //lift up counter weight
     liftUp = true;
     while(!buttonLimit.get_value())
@@ -547,7 +545,6 @@ void skillsPark()
 }
 void skills()
 {
-
    //lift up counter weight
     liftUp = true;
     while(!buttonLimit.get_value())
@@ -624,7 +621,7 @@ void skills()
     moveToPoint(-25, 75, 1.08, true, 80, 1200);
     //go to platform
 
-    moveToPoint(-107, 27, 1.57, true, 90, 7000, 0.2, 0.2, 1.0);
+    moveToPoint(-107, 29, 1.57, true, 90, 7000, 0.2, 0.2, 1.0);
     clawLift.move_absolute(-3000, 200);
     pros::delay(1000);
     clawOpened = true;
@@ -633,26 +630,7 @@ void skills()
     frontGoalLift.move_absolute(0, 200);
     pros::delay(1000);
     clawOpened = false;
-        moveToPoint(-101, 27, 0.0, true, 90, 3000, 0.2, 0.2, 1.0);
-    /*
-    moveToPoint(-98, 27, 1.57, true, 90, 3000, 0.2, 0.2, 1.0);
-
-    moveToPoint(-98, 27, -1.57, true, 90, 3000, 0.2, 0.2, 1.0);
-    clawLift.move_absolute(-1200, 200);
-    pros::delay(750);
-    clawOpened = false;
-    pros::delay(750);
-    clawLift.move_absolute(-4500, 200);
-
-    moveToPoint(-98, 27, 1.57, true, 90, 3000, 0.2, 0.2, 1.0);
-    moveToPoint(-107, 27, 1.57, true, 90, 3000, 0.2, 0.2, 1.0);
-
-    clawLift.move_absolute(-3000, 200);
-    pros::delay(750);
-    clawOpened = true;
-    clawLift.move_absolute(-5500, 200);
-    pros::delay(10000);
-*/
+    moveToPoint(-101, 27, 0.0, true, 90, 3000, 0.2, 0.2, 1.0); 
 }
 void leftElim()
 {
@@ -698,6 +676,31 @@ void fastElim()
 
     moveToPoint(0,0,0, false);
     setDrive(0,0);
+}
+void fastElimNew()
+{
+    grabFlag = true;
+    clawLift.move_absolute(-1200, 200);
+    claw.move_absolute(-400, 200);
+
+    setDrive(-200, -200);
+
+    while(grabFlag)
+    {
+        if(frontDistance.get() < 300 && frontDistance.get() != 0)
+        {
+            clawOpened = false;
+            grabFlag = false;
+
+        }
+        pros::delay(10);
+        pros::lcd::print(5, "%f", frontDistance.get());
+    }
+    pros::delay(200);
+        clawLift.move_absolute(-1400, 200);
+
+    moveToPoint(0,-56,1.57, false);
+  //  setDrive(0,0);
 }
 //actually running the auton
 void runAuton()

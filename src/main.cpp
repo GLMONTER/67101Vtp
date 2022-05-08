@@ -504,9 +504,9 @@ void opcontrol()
         
         //slave controller code to control intake
         if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_R1))
-            intake.move(127);
+            intake.move(90);
         else if(slaveController.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-            intake.move(-127);
+            intake.move(-90);
         else
             intake.move(0);
         if(slaveController.is_connected())
