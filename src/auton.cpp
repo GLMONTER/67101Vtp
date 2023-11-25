@@ -119,7 +119,7 @@ void trackPosition()
             float r = R / a; // The radius of the circle the robot travel's around with the right side of the robot
             i = a / 2.0;
             float sinI = sin(i);
-            h = ((r + R_DISTANCE_IN) * sinI) * 3.0;
+            h = ((r + R_DISTANCE_IN) * sinI) * 2.0;
 
             float r2 = S / a; // The radius of the circle the robot travel's around with the back of the robot
             h2 = ((r2 + S_DISTANCE_IN) * sinI) * 2.0;
