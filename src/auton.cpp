@@ -116,7 +116,7 @@ void trackPosition()
         float a = (L - R) / (L_DISTANCE_IN + R_DISTANCE_IN); // The angle that I've traveled
         if (a)
         {
-            float r = R / a; // The radius of the circle the robot travel's around with the right side of the robot
+            float r = R / r; // The radius of the circle the robot travel's around with the right side of the robot
             i = a / 2.0;
             float sinI = sin(i);
             h = ((r + R_DISTANCE_IN) * sinI) * 2.0;
